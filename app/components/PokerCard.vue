@@ -1,8 +1,8 @@
 <template>
     <v-tooltip :text="tootlip" location="top center">
         <template #activator="{ props }">
-            <v-card v-bind="props" class="animated-card" :class="{ selected: selected }" @click="emitVote" theme="light"
-                width="80px" :elevation="selected ? 12 : 0" :color="selected ? color : 'white'">
+            <v-card :loading="loading" v-bind="props" class="animated-card" :class="{ selected: selected }" @click="emitVote" theme="light"
+                width="80px" :elevation="selected ? 12 : 1" :color="selected ? color : 'white'">
                 <v-card-text>
                     <div class="card-value">
                         {{ cardValue }}
@@ -32,6 +32,10 @@ const props = defineProps({
         default: "#3333ff"
     },
     selected: {
+        type: Boolean,
+        default: false
+    },
+    loading: {
         type: Boolean,
         default: false
     }

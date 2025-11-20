@@ -73,7 +73,6 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
 
       try {
-        console.log("Pagination: ",resolvedDirection)
         const response = await $fetch("/api/gitIssues/github", {
           method: "POST",
           headers: {

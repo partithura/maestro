@@ -10,13 +10,17 @@
                 </template>
             </v-toolbar>
             <v-card-text>
-                <div v-html="body"></div>
-                <CardDeck :loading="loading" v-model="selectedCard" />
+                <v-card>
+                    <v-card-text>
+                        <div v-html="body"></div>
+                    </v-card-text>
+                </v-card>
+                <CardDeck :cantVote="cantVote" :loading="loading" v-model="selectedCard" />
             </v-card-text>
             <v-card-actions>
-                <v-btn @click="confirmVote" color="success" variant="tonal">Confirmar voto</v-btn>
-                <v-spacer />
                 <v-btn :href="issueURL" target="_blank">Ver no GitHub</v-btn>
+                <v-spacer />
+                <v-btn :disabled="cantVote" @click="confirmVote" color="success" variant="tonal">Confirmar voto</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -30,6 +34,9 @@ const props = defineProps({
         type: Object,
         default: () => { }
     }
+})
+const cantVote = computed(()=>{
+    return authStore.getCardDeck.length<=1
 })
 const emits = defineEmits(["confirmVote"])
 const model = defineModel({ type: Boolean })
@@ -57,12 +64,13 @@ function closeModal() {
 }
 
 function confirmVote() {
+    //verificar se o usuário é management e decidir se salva no git ou no mongo
     emits("confirmVote", {
         issue: props.issue,
         vote: selectedCard.value,
         user: user.value
     })
-    model.value = false
+    closeModal()
 }
 
 watch(model, async (n, o) => {

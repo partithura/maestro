@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import Issue from "~~/server/models/issue.model";
 const config = useRuntimeConfig();
 
-const { mongodbURL, mongodbPassword, mongodbUsername } = config;
+const { mongodbURL, mongodbPassword, mongodbUsername, mongodbDatabase, mongodbAuthSource} = config;
 
 export default defineEventHandler(async (event) => {
-  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/issues?authSource=admin`;
+  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/${mongodbDatabase}?authSource=${mongodbAuthSource}`;
   await mongoose.connect(connectionString);
 
   // Obter o token do header Authorization

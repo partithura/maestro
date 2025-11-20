@@ -3,10 +3,10 @@ import Issue from "~~/server/models/issue.model";
 import { Octokit } from "octokit";
 const config = useRuntimeConfig();
 
-const { mongodbURL, mongodbPassword, mongodbUsername } = config;
+const { mongodbURL, mongodbPassword, mongodbUsername, mongodbDatabase, mongodbAuthSource} = config;
 
 export default defineEventHandler(async (event) => {
-  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/issues?authSource=admin`;
+  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/${mongodbDatabase}?authSource=${mongodbAuthSource}`;
   await mongoose.connect(connectionString);
 
   // Obter o token do header Authorization
@@ -38,13 +38,15 @@ export default defineEventHandler(async (event) => {
     });
 
     const { issueId } = getQuery(event);
-    try {
-      const existingIssue = await Issue.findOne({ id: issueId });
-      return existingIssue;
-    } catch (error) {
-      return `Não foi possível executar a operação: ${error.message}`;
+    if (isAuthenticated) {
+      try {
+        const existingIssue = await Issue.findOne({ id: issueId });
+        return existingIssue;
+      } catch (error) {
+        return `Não foi possível executar a operação: ${error.message}`;
+      }
     }
   } catch (e) {
-    return `Erro na validação: ${e}`
+    return `Erro na validação: ${e}`;
   }
 });

@@ -37,6 +37,8 @@ export default defineNuxtConfig({
     mongodbURL: process.env.MONGODB_URL,
     mongodbPassword: process.env.MONGODB_PASSWORD,
     mongodbUsername: process.env.MONGODB_USERNAME,
+    mongodbDatabase: process.env.MONGODB_DATABASE,
+    mongodbAuthSource: process.env.MONGODB_AUTH_SOURCE,
     githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
     jwtSecret: process.env.JWT_SECRET,
     public: {
