@@ -1,18 +1,9 @@
 import mongoose from "mongoose";
 import Card from "~~/server/models/card.model";
-const config = useRuntimeConfig();
-
-const {
-  mongodbURL,
-  mongodbPassword,
-  mongodbUsername,
-  mongodbDatabase,
-  mongodbAuthSource,
-} = config;
+import { env } from "~~/server/support/env";
 
 export default defineEventHandler(async (event) => {
-  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/${mongodbDatabase}?authSource=${mongodbAuthSource}`;
-  await mongoose.connect(connectionString);
+  await mongoose.connect(env.MONGODB_CONNECTION_STRING);
   try {
     const response = await Card.find();
     return response;

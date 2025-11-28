@@ -1,5 +1,19 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import type { ViteConfig } from "nuxt/schema";
+import vuetify from "vite-plugin-vuetify";
+import { env } from "./server/support/env";
+
+const addHook = (config: Readonly<ViteConfig>): void => {
+  if (!config.plugins) {
+    return;
+  }
+  config.plugins.push(
+    vuetify({
+      autoImport: true,
+    })
+  );
+}
+
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
@@ -12,16 +26,7 @@ export default defineNuxtConfig({
     // "@nuxt/icon",
     '@pinia/nuxt',
     (_options, nuxt) => {
-      nuxt.hooks.hook("vite:extendConfig", (config) => {
-        config.plugins.push(
-          vuetify({
-            autoImport: true,
-            // styles: {
-            //   configFile: "/assets/settings.scss", // Optional: for custom SASS variables
-            // },
-          })
-        );
-      });
+      nuxt.hooks.hook("vite:extendConfig", addHook);
     },
   ],
   plugins: ['~/plugins/vuetify.js'],
@@ -36,18 +41,16 @@ export default defineNuxtConfig({
     host: '0.0.0.0' // This makes the server accessible from any IP address on your network
   },
   runtimeConfig: {
-    adminTeamName: process.env.ADMIN_TEAM_NAME,
-    organizationName: process.env.ORGANIZATION_NAME,
-    mongodbURL: process.env.MONGODB_URL,
-    mongodbPassword: process.env.MONGODB_PASSWORD,
-    mongodbUsername: process.env.MONGODB_USERNAME,
-    mongodbDatabase: process.env.MONGODB_DATABASE,
-    mongodbAuthSource: process.env.MONGODB_AUTH_SOURCE,
-    githubClientSecret: process.env.GITHUB_CLIENT_SECRET,
-    jwtSecret: process.env.JWT_SECRET,
+    githubClientId: env.GITHUB_CLIENT_ID,
+    adminTeamName: env.ADMIN_TEAM_NAME,
+    organizationName: env.ORGANIZATION_NAME,
+    mongodbURL: env.MONGODB_CONNECTION_STRING,
+    mongodbPassword: env.MONGODB_PASSWORD,
+    mongodbDatabase: env.MONGODB_DATABASE,
+    mongodbAuthSource: env.MONGODB_AUTH_SOURCE,
+    githubClientSecret: env.GITHUB_CLIENT_SECRET,
     public: {
-      organizationName: process.env.ORGANIZATION_NAME,
-      adminTeamName: process.env.ADMIN_TEAM_NAME,
+      githubClientId: env.GITHUB_CLIENT_ID,
     },
   },
 });

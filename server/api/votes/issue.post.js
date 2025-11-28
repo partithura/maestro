@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
 import Issue from "~~/server/models/issue.model";
-const config = useRuntimeConfig();
-
-const { mongodbURL, mongodbPassword, mongodbUsername, mongodbDatabase, mongodbAuthSource} = config;
+import { env } from "~~/server/support/env";
 
 export default defineEventHandler(async (event) => {
-  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/${mongodbDatabase}?authSource=${mongodbAuthSource}`;
-  await mongoose.connect(connectionString);
+  await mongoose.connect(env.MONGODB_CONNECTION_STRING);
 
   // Obter o token do header Authorization
   const authHeader = getHeader(event, "Authorization");

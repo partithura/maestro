@@ -1,17 +1,14 @@
 import mongoose from "mongoose";
 import Project from "~~/server/models/project.model";
-const config = useRuntimeConfig();
-
-const { mongodbURL, mongodbPassword, mongodbUsername, mongodbDatabase, mongodbAuthSource} = config;
+import { env } from "~~/server/support/env";
 
 export default defineEventHandler(async (event) => {
-  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/${mongodbDatabase}?authSource=${mongodbAuthSource}`;
-  await mongoose.connect(connectionString);
+  await mongoose.connect(env.MONGODB_CONNECTION_STRING);
 
   const body = await readBody(event);
-  const {number} = body;
+  const { number } = body;
   try {
-    const response = await Project.findOneAndDelete({number:number});
+    const response = await Project.findOneAndDelete({ number: number });
     return response;
   } catch (error) {
     throw createError({
