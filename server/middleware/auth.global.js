@@ -4,25 +4,24 @@ const ADMIN_TEAM_NAME = config.adminTeamName;
 const ORGANIZATION_NAME = config.organizationName;
 
 const publicRoutes = [
+  "/api/effort/areas/list",
+  "/api/effort/modules/list",
   "/api/user/github",
   "/configuration",
   "/",
   "/dashboard",
   "/login",
+  ""
 ];
 
 export default defineEventHandler(async (event) => {
-    console.log("inicio:")
   const token = getHeader(event, "authorization")?.replace("Bearer ", "");
   const username = getHeader(event, "username");
   const url = event.node.req.url;
-    console.warn("token: ",token)
-    console.warn("username: ",username)
-    console.warn("url: ",url)
   if (publicRoutes.some((route) => url === route)) {
     return;
   }
-
+//https://api.github.com/orgs/partithura/projectsV2/14/items?q=type%3ATask%20status%3AVoting&per_page=12
   if (!token) {
     throw createError({
       statusCode: 400,
@@ -37,7 +36,6 @@ export default defineEventHandler(async (event) => {
 //   }
 
   const isValid = await validateToken(token, username); // sua lógica aqui
-  console.warn("isValid:", isValid);
   if (!isValid) {
     throw createError({
       statusCode: 418,
@@ -48,7 +46,6 @@ export default defineEventHandler(async (event) => {
 
 // Função de validação (pode ser importada de outro arquivo)
 async function validateToken(token, username) {
-  console.warn("Validating:", token, username);
   const octokit = new Octokit({
     auth: token,
   });

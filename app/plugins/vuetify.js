@@ -12,6 +12,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
     components,
     directives,
+    // styles: {
+    //   configFile: "/assets/settings.scss",
+    // },
   });
   nuxtApp.vueApp.use(vuetify);
 });

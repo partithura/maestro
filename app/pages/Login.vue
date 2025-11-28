@@ -12,14 +12,14 @@
 
 <script setup>
 // Define o layout "auth"
-import { appStore } from '#imports'
+import { useAppStore } from '#imports'
 definePageMeta({
     layout: 'auth'
 })
 const token = ref('')
 const error = ref(false)
 const router = useRouter()
-const authStore = appStore()
+const appStore = useAppStore()
 const loading = ref(false)
 
 const invalid = computed(() => {
@@ -32,21 +32,18 @@ const login = () => {
     // Salva o token no cookie
     const githubToken = useCookie('token', { maxAge: 60 * 60 * 24 * 7 })
     githubToken.value = token.value
-    authStore.updateCurrentToken(token.value)
-    console.log("TOKEN DEVE ESTAR VALIDADO AQUI:", authStore.getCurrentToken)
-    authStore.updateUser(token.value)
+    appStore.updateCurrentToken(token.value)
+    appStore.updateUser(token.value)
         .then(valid => {
-            console.log("VALID:",valid)
             if (!valid.id) {
                 error.value = true
             } else {
                 // Redireciona para dashboard
-                console.log("REDIRECIONADO")
                 router.push('/dashboard')
             }
         })
         .catch(e => {
-            console.log("Falha", e)
+            window.alert(`Erro na chamada em appStore.updateUser(${token.value}). Error:${e}`)
         })
         .finally(() => {
             loading.value = false

@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
         {
           minimumValue: body.minimumValue,
           maximumValue: body.maximumValue,
+          tooltip: body.tooltip,
           color: body.color,
         }
       );

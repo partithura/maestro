@@ -1,14 +1,14 @@
 <template>
     <v-col cols="12" sm="12" md="6" lg="4" xl="3" xxl="2">
-        <v-card @click="viewIssue" height="100%" max-height="250px" :title="props.issue.fields[0].value.raw">
+        <v-card variant="outlined" @click="viewIssue" height="100%" max-height="250px" :title="props.issue.fields[0].value.raw">
             <v-card-text class="card-description">
-                <div v-html="props.issue.content.body"></div>
+                <div v-html="mdBody"></div>
             </v-card-text>
             <v-card-actions class="pb-0 mb-0">
-                <v-chip v-for="label in props.issue.content.labels" :key="label.id" :color="parseColor(label.color)">{{label.name}}</v-chip>
+                <v-chip v-for="label in props.issue.content.labels" :key="label.id" :color="parseColor(label.color)" variant="outlined">{{label.name}}</v-chip>
             </v-card-actions>
             <v-card-actions class="pt-0 mt-0">
-                <v-chip :color="parseColor(props.issue?.content?.type?.color)">{{props.issue?.content?.type?.name}}</v-chip>
+                <v-chip :color="parseColor(props.issue?.content?.type?.color)" variant="outlined">{{props.issue?.content?.type?.name}}</v-chip>
             </v-card-actions>
         </v-card>
     </v-col>
@@ -20,6 +20,9 @@ const props = defineProps({
         type:Object,
         default:()=>{}
     }
+})
+const mdBody = computed(()=>{
+    return props.issue.content.body
 })
 function viewIssue() {
     emits("click",props.issue)

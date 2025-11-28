@@ -101,22 +101,22 @@
     </v-card>
 </template>
 <script setup>
-import { appStore } from '#imports'
-const authStore = appStore()
+import { useAppStore } from '#imports'
+const appStore = useAppStore()
 onMounted(() => {
     loading.value = true
-    if (!authStore.getCurrentUserInfo.isManagement) {
+    if (!appStore.getCurrentUserInfo.isManagement) {
         const token = useCookie("token").value;
-        authStore.checkToken(token)
+        appStore.checkToken(token)
             .finally(() => {
-                authStore.fetchProjects()
+                appStore.fetchProjects()
                     .finally(() => {
                         loading.value = false
                         tab.value = projects.value?.find(p=>p.isActive)?.number
                     })
             })
     } else {
-        authStore.fetchProjects()
+        appStore.fetchProjects()
             .finally(() => {
                 loading.value = false
                 //setar a tab do projeto ativo como tab ativa
@@ -136,9 +136,9 @@ function confirmDeletion(project) {
 }
 function deleteProject() {
     loading.value = true
-    authStore.deleteProject(deletionProject.value.number)
+    appStore.deleteProject(deletionProject.value.number)
         .finally(() => {
-            authStore.fetchProjects()
+            appStore.fetchProjects()
             loading.value = false
             closeDeletionModal()
             tab.value = projects.value?.find(p=>p.isActive)?.number
@@ -167,18 +167,18 @@ async function updateProject(v, allProjects) {
     debounceUpdate.value = setTimeout(async () => {
         loading.value = true
         if(allProjects){
-            await authStore.updateOtherProjects(v)
+            await appStore.updateOtherProjects(v)
         }
-        await authStore.updateProject(v)
+        await appStore.updateProject(v)
         loading.value = false
-        authStore.fetchProjects()
+        appStore.fetchProjects()
         .finally(()=>{
             tab.value = projects.value?.find(p=>p.isActive)?.number
         })
     }, 1000)
 }
 const projects = computed(() => {
-    return authStore.getProjects
+    return appStore.getProjects
 })
 function openNewProjectModal() {
     newProjectModal.value = true
@@ -196,11 +196,11 @@ function closeModal() {
 async function saveProject() {
     //salvar o projeto na API
     loading.value = true
-    await authStore.saveProject(newProject.value)
+    await appStore.saveProject(newProject.value)
     if(newProject.value.isActive){
-        await authStore.updateOtherProjects(newProject.value)
+        await appStore.updateOtherProjects(newProject.value)
     }
-    await authStore.fetchProjects()
+    await appStore.fetchProjects()
     loading.value = false
     closeModal();
 }

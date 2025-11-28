@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-export const appStore = defineStore("appStore", {
+export const useAppStore = defineStore("appStore", {
   state: () => ({
     userInfo: {},
     token: "",
@@ -31,18 +31,17 @@ export const appStore = defineStore("appStore", {
       }
 
       try {
-        console.log("TENTANDO LOGAR: ", token);
         const user = await $fetch("/api/user/github", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log("USER:", user);
         if (user.id) {
           this.updateCurrentUserInfo(user);
           this.updateCurrentToken(token);
           return user;
         } else {
+          this.logout();
           return false;
         }
       } catch (error) {
@@ -51,15 +50,13 @@ export const appStore = defineStore("appStore", {
       }
     },
     async checkToken(token) {
-        console.log("TOKENTOKENTOKEN",token)
-
       const user = await $fetch("/api/user/github", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      if(user.id){
+      if (user.id) {
         this.userInfo = user;
       }
       return user;
@@ -71,6 +68,7 @@ export const appStore = defineStore("appStore", {
       this.token = "";
       this.cards = [];
       this.projects = [];
+      navigateTo('/login')
     },
     //Cartas
     async fetchCardDeck() {
@@ -91,7 +89,7 @@ export const appStore = defineStore("appStore", {
         this.cards = newCardResult;
         return newCardResult;
       } catch (error) {
-        return false
+        return false;
       }
     },
     updateCardDeck(v) {
@@ -173,7 +171,6 @@ export const appStore = defineStore("appStore", {
         throw new Error("Nenhum token disponível.");
       }
       try {
-        console.log("Autorizando com o username: ",this.getCurrentUserInfo.login)
         const projects = await $fetch("/api/projects/read", {
           method: "GET",
           headers: {
@@ -181,12 +178,11 @@ export const appStore = defineStore("appStore", {
             username: this.getCurrentUserInfo.login,
           },
         });
-        console.log("Projects: ",projects)
         this.projects = projects;
         return projects;
       } catch (error) {
-        console.log("Erro chamando projetos: ",error.message)
-        return []
+        window.alert(`Erro na appStore.fetchProjects; Error: ${error}`)
+        return [];
       }
     },
     async updateProject(v) {

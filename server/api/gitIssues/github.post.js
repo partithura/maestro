@@ -1,7 +1,21 @@
 import { Octokit } from "octokit";
+import mongoose from "mongoose";
+import ErrorLog from "../../models/error.model"
+
+const config = useRuntimeConfig();
+const {
+  mongodbURL,
+  mongodbPassword,
+  mongodbUsername,
+  mongodbDatabase,
+  mongodbAuthSource,
+} = config;
 export default defineEventHandler(async (event) => {
   // Obter o token do header Authorization
   const authHeader = getHeader(event, "Authorization");
+  const username = getHeader(event, "username");
+  const connectionString = `mongodb://${mongodbUsername}:${mongodbPassword}@${mongodbURL}/${mongodbDatabase}?authSource=${mongodbAuthSource}`;
+  await mongoose.connect(connectionString);
 
   const githubToken = authHeader.substring(7); // Remove "Bearer "
 
@@ -56,6 +70,18 @@ export default defineEventHandler(async (event) => {
       headers: responseHeaders,
     };
   } catch (error) {
+    console.error("Falha em github.post");
+    console.warn("Error: ", error);
+    const newError = new ErrorLog({
+      apiEndpoint: 'gitIssues/post',
+      gitEndpoint: '/orgs/{org}/projectsV2/{project_number}/items',
+      method: "GET",
+      requestBody: body,
+      errorMessage: error.message,
+      errorDetails: error,
+      username: username, // Optional
+    });
+    await newError.save(); // Salvar a nova issue no banco
     throw createError({
       statusCode: 500,
       message: `Falha ao buscar issues do GitHub via REST: ${error}`,

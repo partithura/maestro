@@ -1,38 +1,34 @@
-import { appStore } from "#imports";
-let authStore;
+import { useAppStore } from "#imports";
+let appStore;
 
 export default defineNuxtRouteMiddleware((to, from) => {
-  //Criar authStore caso ainda não tenha sido instanciada
-  if (!authStore) {
-    authStore = appStore();
+  //Criar appStore caso ainda não tenha sido instanciada
+  if (!appStore) {
+    appStore = useAppStore();
   }
 
   //pega o token dos cookies e valida
   const token = useCookie("token").value;
-  console.log("PORRA DO TOKEN: ", token);
 
   //página de login com acesso público
-  const publicPages = ["/login"];
+  const publicPages = ["/login","/"];
 
-  authStore
+  appStore
     .checkToken(token)
     .then((isValidToken) => {
       //caso não consiga validar o token acessando uma página privada, limpa o token e navega para login
-      console.log("IsValidToken",isValidToken)
       if (!isValidToken && !publicPages.includes(to.path)) {
-        console.log("DEVERIA ENTRAR AQUI");
-        authStore.logout();
+        appStore.logout();
         return navigateTo("/login");
       }
 
       // if (!token && !publicPages.includes(to.path)) {
-      //   console.log("Deslogando usuário")
-      //   authStore.logout()
+      //   appStore.logout()
       //   return navigateTo("/login");
       // }
 
-      // if (isValidToken && !authStore.getCurrentUserInfo.login) {
-      //   authStore.logout();
+      // if (isValidToken && !appStore.getCurrentUserInfo.login) {
+      //   appStore.logout();
       //   return navigateTo("/login");
       // }
 
@@ -41,7 +37,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
       }
     })
     .catch((e) => {
-      authStore.logout();
+      appStore.logout();
       return navigateTo("/login");
     })
 });

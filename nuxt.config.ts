@@ -34,7 +34,12 @@ export default defineNuxtConfig({
   css: [
     "vuetify/lib/styles/main.sass", // Main Vuetify styles
     "@mdi/font/css/materialdesignicons.min.css", // Optional: Material Design Icons
+    "~/assets/github-markdown.css" //github markdonw
   ],
+  devServer: {
+    port: 3000, // You can specify a different port if needed
+    host: '0.0.0.0' // This makes the server accessible from any IP address on your network
+  },
   runtimeConfig: {
     githubClientId: env.GITHUB_CLIENT_ID,
     adminTeamName: env.ADMIN_TEAM_NAME,

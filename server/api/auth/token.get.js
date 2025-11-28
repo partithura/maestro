@@ -18,6 +18,5 @@ export default defineEventHandler(async (event) => {
 
   const response = await octokit.request("GET /user")
 
-  console.log(response.data)
   return response.data
 });

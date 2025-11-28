@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
         value: body.value,
         minimumValue: body.minimumValue,
         maximumValue: body.maximumValue,
+        tooltip: body.tooltip, //Colocar a descrição do valor da carta
         color: body.color,
       });
       const response = await newCard.save(); // Salvar a nova issue no banco

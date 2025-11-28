@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { appStore } from "#imports";
+import { useAppStore } from "#imports";
 
 function parseLinkHeaderManually(linkHeader) {
   const links = {};
@@ -63,7 +63,7 @@ export const useIssuesStore = defineStore("issuesStore", {
       this.links = v;
     },
     async fetchIssues(filters, pagination = null) {
-      const user = appStore().getCurrentUserInfo.login;
+      const user = useAppStore().getCurrentUserInfo.login;
       let resolvedDirection;
       if (pagination?.direction) {
         pagination.direction == "next"
@@ -96,7 +96,7 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
     },
     async setIssueVote(issue) {
-      const user = appStore().getCurrentUserInfo.login;
+      const user = useAppStore().getCurrentUserInfo.login;
       const githubToken = useCookie("token");
       if (!githubToken.value) {
         throw new Error("Nenhum token disponível.");
@@ -119,7 +119,7 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
     },
     async fetchCurrentIssue(issueId) {
-      const user = appStore().getCurrentUserInfo.login;
+      const user = useAppStore().getCurrentUserInfo.login;
       const githubToken = useCookie("token");
       if (!githubToken.value) {
         throw new Error("Nenhum token disponível.");
@@ -142,9 +142,9 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
     },
     async updateIssueEffort({ issue, value }) {
-      const authStore = appStore();
-      const user = authStore.getCurrentUserInfo.login
-      const activeProject = authStore.getActiveProject
+      const appStore = useAppStore();
+      const user = appStore.getCurrentUserInfo.login
+      const activeProject = appStore.getActiveProject
       const githubToken = useCookie("token");
       if (!githubToken.value) {
         throw new Error("Nenhum token disponível.");

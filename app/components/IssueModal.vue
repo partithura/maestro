@@ -20,6 +20,8 @@
                 </v-card>
                 <CardDeck ref="cardDeck" :votes="databaseIssue?.votes" :cantVote="cantVote" :loading="loading"
                     v-model="selectedCard" />
+
+                <GitChat :issue="issue" />
             </v-card-text>
             <v-card-actions>
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
@@ -33,9 +35,9 @@
     </v-dialog>
 </template>
 <script setup>
-import { appStore, useIssuesStore } from '#imports'
+import { useAppStore, useIssuesStore } from '#imports'
 import MarkdownIt from 'markdown-it';
-const authStore = appStore()
+const appStore = useAppStore()
 const issuesStore = useIssuesStore()
 const md = new MarkdownIt();
 const props = defineProps({
@@ -45,7 +47,7 @@ const props = defineProps({
     }
 })
 const cantVote = computed(() => {
-    return authStore.getCardDeck.length <= 1 || !isReady.value
+    return appStore.getCardDeck.length <= 1 || !isReady.value
 })
 const emits = defineEmits(["confirmVote"])
 const model = defineModel({ type: Boolean })
@@ -66,7 +68,7 @@ const issueURL = computed(() => {
     return props.issue?.content?.html_url
 })
 const user = computed(() => {
-    return authStore.getCurrentUserInfo
+    return appStore.getCurrentUserInfo
 })
 function closeModal() {
     selectedCard.value = null
@@ -100,7 +102,7 @@ function confirmVote() {
             }).finally(() => {
                 loading.value = false
             })
-    } else if (authStore) {
+    } else if (appStore) {
         emits("confirmVote", {
             issue: props.issue,
             vote: selectedCard.value,

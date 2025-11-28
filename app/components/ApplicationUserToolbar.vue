@@ -9,11 +9,11 @@
             </v-btn>
         </v-app-bar-title>
         <template v-slot:append>
-            <v-tooltip text="Tema" location="bottom">
+            <!-- <v-tooltip text="Tema" location="bottom">
                 <template v-slot:activator="{ props }">
                     <v-btn @click="toggleTheme" v-bind="props" icon="mdi-theme-light-dark" />
                 </template>
-            </v-tooltip>
+            </v-tooltip> -->
             <v-menu>
                 <template v-slot:activator="{ props }">
                     <v-avatar v-bind="props" :image="userImageUrl" start />
@@ -36,13 +36,12 @@
     </v-app-bar>
 </template>
 <script setup>
-import { ref } from '#imports'
 import { useTheme } from 'vuetify'
-import { appStore } from '#imports'
+import { useAppStore } from '#imports'
 
-const authStore = appStore()
+const appStore = useAppStore()
 
-const userImageUrl = computed(() => authStore.getCurrentUserInfo.avatar_url)
+const userImageUrl = computed(() => appStore.getCurrentUserInfo.avatar_url)
 
 const userMenu = ref([
     {
@@ -57,12 +56,12 @@ function toggleTheme() {
 }
 
 const isManagement = computed(() => {
-    return authStore.getCurrentUserInfo.isManagement
+    return appStore.getCurrentUserInfo.isManagement
 })
 
 const logout = () => {
     // Remove o token
-    authStore.logout()
+    appStore.logout()
 
     // Redireciona para login
     navigateTo('/login')

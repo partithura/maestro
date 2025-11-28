@@ -52,21 +52,21 @@
 </template>
 
 <script setup>
-import { appStore, useIssuesStore } from '#imports'
-const authStore = appStore();
+import { useAppStore, useIssuesStore } from '#imports'
+const appStore = useAppStore();
 const issuesStore = useIssuesStore()
 const loading = ref(true)
 const paginationSizes = ref([12, 24, 32])
 const paginationSize = ref(12)
 const isManagement = computed(() => {
-    return authStore.getCurrentUserInfo.isManagement
+    return appStore.getCurrentUserInfo.isManagement
 })
 definePageMeta({
     layout: 'app',
 })
 
 const user = computed(() => {
-    return authStore.getCurrentUserInfo
+    return appStore.getCurrentUserInfo
 })
 const issues = computed(() => {
     return issuesStore.getCurrentIssues
@@ -101,10 +101,10 @@ async function confirmVote(issue) {
 const showIssueModal = ref(false)
 const selectedIssue = ref()
 const noResultsMessage = computed(() => {
-    return authStore.getActiveProject.number ? 'Não há tasks para votação ou o filtro não retornou nenhuma task.' : 'Não há projeto ativo no momento.'
+    return appStore.getActiveProject.number ? 'Não há tasks para votação ou o filtro não retornou nenhuma task.' : 'Não há projeto ativo no momento.'
 })
 const noResultsHint = computed(() => {
-    return authStore.getCurrentUserInfo.isManagement ? 'Clique aqui para abrir a página de configurações.' : 'Aguarde um administrador do projeto configurar um projeto ativo.'
+    return appStore.getCurrentUserInfo.isManagement ? 'Clique aqui para abrir a página de configurações.' : 'Aguarde um administrador do projeto configurar um projeto ativo.'
 })
 
 const nextArrow = computed(() => {
@@ -122,7 +122,7 @@ function viewIssue(issue) {
 
 const query = ref('');
 const activeProject = computed(() => {
-    return authStore.getActiveProject
+    return appStore.getActiveProject
 })
 const debounceUpdate = ref()
 
@@ -130,7 +130,7 @@ async function updateQuery() {
     clearTimeout(debounceUpdate.value)
     debounceUpdate.value = setTimeout(async () => {
         loading.value = true
-        await authStore.updateProject({
+        await appStore.updateProject({
             ...activeProject.value,
             query: query.value
         })
@@ -146,25 +146,25 @@ watch(paginationSize, () => {
 function loadIssues(direction = "") {
     loading.value = true
     let promises = []
-    if (!authStore.getCurrentUserInfo.login) {
+    if (!appStore.getCurrentUserInfo.login) {
         const token = useCookie('token').value
-        promises.push(authStore.checkToken(token))
+        promises.push(appStore.checkToken(token))
     }
     Promise.all(promises)
         .then(() => {
             let fetchPromises = []
-            authStore.fetchProjects()
+            appStore.fetchProjects()
                 .then(() => {
-                    query.value = authStore.getActiveProject.query
-                    if (authStore.getActiveProject.number) {
+                    query.value = appStore.getActiveProject.query
+                    if (appStore.getActiveProject.number) {
                         const filters = {
                             org: "partithura",
-                            projectNumber: authStore.getActiveProject.number,
+                            projectNumber: appStore.getActiveProject.number,
                             paginationSize: paginationSize.value,//ver isso
                             q: query.value
                         }
                         fetchPromises = [
-                            authStore.fetchCardDeck(),
+                            appStore.fetchCardDeck(),
                             issuesStore.fetchIssues(filters, direction)
                         ]
                         Promise.all(fetchPromises)
@@ -174,7 +174,6 @@ function loadIssues(direction = "") {
                     }
                 })
         }).catch(error => {
-            window.alert(error.message)
             loading.value = false
         })
 }

@@ -14,9 +14,9 @@
 </template>
 
 <script setup>
-// import { appStore } from '#imports';
-// const authStore = appStore()
+// import { useAppStore } from '#imports';
+// const appStore = useAppStore()
 // onBeforeMount(async ()=>{
-//     await authStore.updateUser()
+//     await appStore.updateUser()
 // })
 </script>
