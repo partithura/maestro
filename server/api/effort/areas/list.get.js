@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import EffortArea from "~~/server/models/effortArea.model";
 import { env } from "~~/server/support/env";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   await mongoose.connect(env.MONGODB_CONNECTION_STRING);
   try {
-    return EffortArea.find()
+    return EffortArea.find();
   } catch (error) {
     throw createError({
       statusCode: 500,

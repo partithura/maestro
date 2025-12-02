@@ -1,24 +1,26 @@
 <template>
     <v-row>
         <v-col>
-            <v-text-field v-model="area.text" @update:model-value="updateModule()" :loading="loading"
-                :disabled="loading" prepend-icon="mdi-delete" label="Título"
-                @click:prepend="showDeleteConfirm"></v-text-field>
+            <v-text-field
+v-model="area.text" :loading="loading" :disabled="loading"
+                prepend-icon="mdi-delete" label="Título" @update:model-value="updateModule()"
+                @click:prepend="showDeleteConfirm"/>
         </v-col>
         <v-col>
-            <v-text-field v-model="area.value" @update:model-value="updateModule()" :loading="loading"
-                :disabled="loading" label="Valor"></v-text-field>
+            <v-text-field
+v-model="area.value" :loading="loading" :disabled="loading"
+                label="Valor" @update:model-value="updateModule()"/>
         </v-col>
-        <v-dialog max-width="540px" v-model="deleteModal">
+        <v-dialog v-model="deleteModal" max-width="540px">
             <v-card :loading="loading" title="Confirmar exclusão do projeto?">
                 <v-card-text>
                     Deseja mesmo excluir a Área "{{ area.text }}"?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn variant="tonal" :disabled="loading" @click="deleteModal = false" color="success">Cancelar</v-btn>
+                    <v-btn variant="tonal" :disabled="loading" color="success" @click="deleteModal = false">Cancelar</v-btn>
                     <v-spacer />
-                    <v-btn variant="tonal" :disabled="loading" @click="deleteArea" color="error">Excluir</v-btn>
+                    <v-btn variant="tonal" :disabled="loading" color="error" @click="deleteArea">Excluir</v-btn>
                     <v-spacer />
                 </v-card-actions>
             </v-card>

@@ -1,8 +1,10 @@
 <template>
     <v-tooltip :text="tootlip" location="top center">
-        <template #activator="{ props }">
-            <v-card :loading="loading" v-bind="props" class="animated-card" :class="{ selected: selected }" @click="emitVote" theme="light"
-                width="80px" :elevation="selected ? 12 : 1" :color="selected ? color : 'white'">
+        <template #activator="activator">
+            <v-card
+:loading="loading" v-bind="activator.props" class="animated-card" :class="{ selected: selected }"
+                theme="light" width="80px" :elevation="selected ? 12 : 1" :color="selected ? color : 'white'"
+                @click="emitVote">
                 <v-card-text>
                     <div class="card-value">
                         {{ cardValue }}

@@ -3,20 +3,21 @@
     <table>
       <tbody>
         <tr>
-          <th></th>
+          <th />
           <th v-for="header in headers" :key="header.value">{{ header.text }}</th>
         </tr>
         <tr v-for="(item, index) in items" :key="`row_${item.value}`">
           <td>{{ item.text }}</td>
           <td v-for="header in headers" :key="`${item.text}_${header.text}_${index}`">
-            <v-select max-width="140px" v-model="selections[header.value][item.value]" v-bind="props" density="compact"
+            <v-select
+v-model="selections[header.value][item.value]" max-width="140px" v-bind="props" density="compact"
               :items="header.points" item-value="value" item-title="text"
               @update:model-value="updateTotal(header.value)" />
           </td>
         </tr>
         <tr>
           <td class="total-value">TOTAL:</td>
-          <td class="total-value" v-for="header in headers" :key="`soma_${header.text}`">
+          <td v-for="header in headers" :key="`soma_${header.text}`" class="total-value">
             {{ selections[header.value].total }}
           </td>
         </tr>
@@ -86,10 +87,6 @@ function resetTable() {
   selections.value = setInitialSelections()
 }
 
-function createTooltip(head, item) {
-  return `Necessita ${head} ${item}`
-}
-
 function findClosestValue(numero) {
   // Ordena o effortValues.value para garantir que está em ordem crescente
   const ordenado = effortValues.value.slice().sort((a, b) => a - b);
@@ -128,13 +125,15 @@ tr {
   font-size: 1.5rem;
   background-color: rgb(27, 76, 151);
 }
-.table-container{
+
+.table-container {
   display: flex;
   align-items: center;
   align-content: center;
   justify-content: center;
 }
-table{
+
+table {
   border: 1px solid white;
 }
 </style>

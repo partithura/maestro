@@ -1,18 +1,19 @@
 <template>
-  <v-card :variant="isManagement ? 'outlined' : 'flat'" :loading="props.loading" class="mb-4" :disabled="props.loading"
+  <v-card
+:variant="isManagement ? 'outlined' : 'flat'" :loading="props.loading" class="mb-4" :disabled="props.loading"
     :color="isManagement ? 'white' : 'green-darken-4'" title="Votação:">
     <v-card-text class="mt-6 pb-2 pt-2">
       <v-row v-if="isManagement" align="center" justify="center">
-        <v-col cols="12" md="2" v-for="vote in votes" :key="vote.user.id">
+        <v-col v-for="vote in votes" :key="vote.user.id" cols="12" md="2">
           <v-card variant="outlined" hover elevation="6" color="white">
             <v-toolbar>
               <template #prepend>
-                <v-avatar :image="vote.user.avatar_url"></v-avatar>
+                <v-avatar :image="vote.user.avatar_url" />
               </template>
               <template #title>
                 <v-tooltip location="top left">
-                  <template #activator="{ props }">
-                    <span v-bind="props">{{ vote.user.name }}</span>
+                  <template #activator="activator">
+                    <span v-bind="activator.props">{{ vote.user.name }}</span>
                   </template>
                   {{ vote.user.name }}
                 </v-tooltip>
@@ -45,8 +46,9 @@
       <v-row v-else align="center" justify="center" class="pb-6">
         <h4 v-if="cantVote" class="mb-12">Não há cartas suficientes definidas nas configurações</h4>
         <template v-else>
-          <v-col cols="6" md="1" v-for="card in cards" :key="card.value">
-            <PokerCard :loading="props.loading" :selected="card.value === model" :card-value="card.value"
+          <v-col v-for="card in cards" :key="card.value" cols="6" md="1">
+            <PokerCard
+:loading="props.loading" :selected="card.value === model" :card-value="card.value"
               :color="card.color" :minimum-value="card.minimumValue" :maximum-value="card.maximumValue"
               @click="selectCard" />
           </v-col>
@@ -58,7 +60,7 @@
             <div class="total-title">
               Use a tabela abaixo para ter uma ideia mais objetiva de nota para a task.
             </div>
-            <VoteCalculator :loading="voteLoading" ref="table" :headers="headers" :items="items" :effort="effort" />
+            <VoteCalculator ref="table" :loading="voteLoading" :headers="headers" :items="items" :effort="effort" />
             <div class="total-description">
               O total sugerido para essa task é de <span class="total-calculated">{{ total }}</span> ponto(s)
             </div>
@@ -195,17 +197,19 @@ onMounted(() => {
 defineExpose({ result })
 </script>
 <style lang="scss" scoped>
-.total-description{
+.total-description {
   text-align: center;
   margin-top: 24px;
   font-size: 1.5rem;
 }
-.total-title{
+
+.total-title {
   text-align: center;
   margin-bottom: 24px;
   font-size: 1.5rem;
 }
-.total-calculated{
+
+.total-calculated {
   font-weight: 900;
   font-size: 2rem;
   border: 3px solid white;

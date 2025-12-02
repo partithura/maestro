@@ -1,11 +1,12 @@
 <template>
     <v-card :loading="loading" width="300px" title="Faça login via Fine-Grained Token" elevation="12">
         <v-card-text>
-            <v-text-field v-model="token" :loading="loading" label="GitHub Fine-Grained Token" type="password" required
+            <v-text-field
+v-model="token" :loading="loading" label="GitHub Fine-Grained Token" type="password" required
                 clearable hint="Cole seu token de acesso do GitHub" persistent-hint :error="error" />
         </v-card-text>
         <v-card-actions>
-            <v-btn :disabled="loading || invalid" block @click="login" text="Login com GitHub" />
+            <v-btn :disabled="loading || invalid" block text="Login com GitHub" @click="login" />
         </v-card-actions>
     </v-card>
 </template>

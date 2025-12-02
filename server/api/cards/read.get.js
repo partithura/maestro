@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import Card from "~~/server/models/card.model";
 import { env } from "~~/server/support/env";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   await mongoose.connect(env.MONGODB_CONNECTION_STRING);
   try {
     const response = await Card.find();

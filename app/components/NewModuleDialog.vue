@@ -1,12 +1,12 @@
 <template>
-    <v-dialog persistent max-width="800px" v-model="addModuleModal">
+    <v-dialog v-model="addModuleModal" persistent max-width="800px">
         <v-card>
             <v-toolbar>
                 <template #title>
                     Adicionar novo módulo
                 </template>
                 <template #append>
-                    <v-icon icon="mdi-close" @click="closeModal"></v-icon>
+                    <v-icon icon="mdi-close" @click="closeModal" />
                 </template>
             </v-toolbar>
             <v-card-text>
@@ -14,31 +14,37 @@
                 <v-form v-model="isValid">
                     <v-row align="center">
                         <v-col cols="12" md="6">
-                            <v-text-field validate-on="eager" v-model.trim="computedValue" :rules="variableNameRules" label="Valor do campo"
-                                hint="Valor que vai ser usado na geração da table" />
+                            <v-text-field
+v-model.trim="computedValue" validate-on="eager" :rules="variableNameRules"
+                                label="Valor do campo" hint="Valor que vai ser usado na geração da table" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field validate-on="eager" v-model="newModule.text" :rules="required" label="Texto da coluna"
-                                hint="Texto usado na coluna" />
+                            <v-text-field
+v-model="newModule.text" validate-on="eager" :rules="required"
+                                label="Texto da coluna" hint="Texto usado na coluna" />
                         </v-col>
                         <v-col cols="12" md="12">
-                            <v-text-field v-model="newModule.tooltip" label="Formação da tooltip do módulo"
+                            <v-text-field
+v-model="newModule.tooltip" label="Formação da tooltip do módulo"
                                 hint="Ainda não está sendo utilizado" />
                         </v-col>
                         <v-col cols="12">
                             <v-card variant="outlined" title="Valores:">
                                 <v-card-text class="scrollable">
-                                    <v-row align="center" justify="center" dense v-if="newModule.points.length <= 0">
+                                    <v-row v-if="newModule.points.length <= 0" align="center" justify="center" dense>
                                         <h3 class="text-center">Não há nenhuma pontuação associada.</h3>
                                     </v-row>
-                                    <v-row dense v-for="(point, index) in newModule.points" :key="index">
+                                    <v-row v-for="(point, index) in newModule.points" :key="index" dense>
                                         <v-col>
-                                            <v-number-input validate-on="eager" :rules="pointsRules"
-                                                v-model="point.value" :precision="0" :min="0" label="Valor do ponto"
+                                            <v-number-input
+v-model="point.value" validate-on="eager"
+                                                :rules="pointsRules" :precision="0" :min="0" label="Valor do ponto"
                                                 prepend-icon="mdi-delete" @click:prepend="deleteValue(index)" />
                                         </v-col>
                                         <v-col>
-                                            <v-text-field validate-on="eager" v-model="point.text" :rules="required" label="Valor exibido no select" />
+                                            <v-text-field
+v-model="point.text" validate-on="eager" :rules="required"
+                                                label="Valor exibido no select" />
                                         </v-col>
                                     </v-row>
                                 </v-card-text>
@@ -56,7 +62,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
-                <v-btn :disabled="!isValid" @click="saveModule" color="success" variant="tonal">Salvar Módulo</v-btn>
+                <v-btn :disabled="!isValid" color="success" variant="tonal" @click="saveModule">Salvar Módulo</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -124,13 +130,6 @@ function checkIfUnique(val) {
     return filtered.length <= 1 || 'O valor precisa ser único'
 }
 
-function findHighestValue(arr, property = 'value') {
-    if (!arr || arr.length === 0) {
-        return 0; // Or throw an error, depending on desired behavior
-    }
-    const values = arr.map(obj => obj[property]);
-    return Math.max(...values) + 1;
-}
 
 const loading = ref(false)
 

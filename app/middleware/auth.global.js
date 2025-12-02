@@ -1,7 +1,7 @@
 import { useAppStore } from "#imports";
 let appStore;
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to) => {
   //Criar appStore caso ainda não tenha sido instanciada
   if (!appStore) {
     appStore = useAppStore();
@@ -11,7 +11,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const token = useCookie("token").value;
 
   //página de login com acesso público
-  const publicPages = ["/login","/"];
+  const publicPages = ["/login", "/"];
 
   appStore
     .checkToken(token)
@@ -36,8 +36,8 @@ export default defineNuxtRouteMiddleware((to, from) => {
         return navigateTo("/dashboard");
       }
     })
-    .catch((e) => {
+    .catch(() => {
       appStore.logout();
       return navigateTo("/login");
-    })
+    });
 });

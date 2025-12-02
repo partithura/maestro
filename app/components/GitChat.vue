@@ -3,7 +3,8 @@
         <v-card-text>
             <v-skeleton-loader v-if="loading" type="article" />
             <template v-else>
-                <ChatPost v-for="commentary in commentaries" :key="commentary.id" :commentary="commentary"
+                <ChatPost
+v-for="commentary in commentaries" :key="commentary.id" :commentary="commentary"
                     :issue="props.issue" @end:saving="loadIssueCommentary()" @end:deleting="loadIssueCommentary()"/>
             </template>
             <NewCommentary :issue="props.issue" @end:saving="loadIssueCommentary()"/>

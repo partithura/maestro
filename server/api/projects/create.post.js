@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
         message: "Já existe um projeto com esse identificador",
       });
     }
-  } catch (error) {
+  } catch {
     try {
       const exists = await Project.exists({ number: body.number });
       if (!exists) {

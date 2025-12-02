@@ -2,11 +2,11 @@
     <v-card>
         <v-card-text>
             <v-form>
-                <v-skeleton-loader type="article" v-if="loading" />
+                <v-skeleton-loader v-if="loading" type="article" />
                 <CardFields v-for="(card, i) in cards" :key="card.value" v-model="cards[i]" />
                 <v-row align="center">
                     <v-col cols="12">
-                        <v-btn :disabled="loading" :loading="loading" @click="showAddCardModal" block size="x-large">
+                        <v-btn :disabled="loading" :loading="loading" block size="x-large" @click="showAddCardModal">
                             <v-icon size="48px">mdi-plus</v-icon>
                         </v-btn>
                     </v-col>

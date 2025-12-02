@@ -9,8 +9,8 @@
                     </v-btn>
                     <span>Nenhum módulo existente</span>
                 </div>
-                <v-tabs v-else :disabled="loading" v-model="tab" color="primary">
-                    <v-tab v-for="module in modules" :value="module.value" :key="module.value">
+                <v-tabs v-else v-model="tab" :disabled="loading" color="primary">
+                    <v-tab v-for="module in modules" :key="module.value" :value="module.value">
                         {{ module.value }}
                     </v-tab>
                     <v-btn variant="flat" size="x-large" @click.stop.prevent="openNewModuleModal">
@@ -22,7 +22,7 @@
         <v-card-text>
             <v-skeleton-loader v-if="loading" type="article" />
             <v-tabs-window v-else v-model="tab">
-                <v-tabs-window-item v-for="(module,index) in modules" :value="module.value" :key="module.value">
+                <v-tabs-window-item v-for="(module,index) in modules" :key="module.value" :value="module.value">
                     <ModuleFields v-model="modules[index]" />
                 </v-tabs-window-item>
             </v-tabs-window>

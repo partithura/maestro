@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
     <div class="commentary-container">
         <v-avatar :image="userAvatar" />
@@ -5,29 +6,33 @@
             <div class="git-title" :class="isCommentFromCurrentUser ? 'current-user-bg' : 'other-user-bg'">
                 <span class="text-white">
                     <b>{{ username }}</b> <a :href="historyLink" target="_blank"><span class="text-grey">{{ time
-                    }}</span></a>
+                            }}</span></a>
                 </span>
                 <v-spacer />
-                <v-icon v-if="isCommentFromCurrentUser" color="error" class="mr-4" @click="deleteComment"
-                    icon="mdi-delete" />
-                <v-icon v-if="isCommentFromCurrentUser" color="white" @click="editComment" icon="mdi-pencil" />
+                <v-icon
+v-if="isCommentFromCurrentUser" color="error" class="mr-4" icon="mdi-delete"
+                    @click="deleteComment" />
+                <v-icon v-if="isCommentFromCurrentUser" color="white" icon="mdi-pencil" @click="editComment" />
             </div>
             <v-card-text class="text-white">
                 <div v-if="isEditing && isCommentFromCurrentUser">
-                    <v-textarea :loading="loading" :disabled="loading" v-model="editableComment"
+                    <v-textarea
+v-model="editableComment" :loading="loading" :disabled="loading"
                         label="Editar comentário" variant="outlined" />
                     <div class="d-flex">
                         <v-spacer />
-                        <v-btn :disabled="loading" @click="cancelUpdate" color="grey" variant="tonal"
-                            class="mr-2">Cancelar</v-btn>
-                        <v-btn :disabled="loading" @click="updateContent" color="success"
-                            variant="tonal">Atualizar</v-btn>
+                        <v-btn
+:disabled="loading" color="grey" variant="tonal" class="mr-2"
+                            @click="cancelUpdate">Cancelar</v-btn>
+                        <v-btn
+:disabled="loading" color="success" variant="tonal"
+                            @click="updateContent">Atualizar</v-btn>
                     </div>
                 </div>
-                <div class="markdown-body" v-else v-html="commentary" />
+                <div v-else class="markdown-body" v-html="commentary" />
             </v-card-text>
         </v-card>
-        <v-dialog width="400px" v-model="showDeleteConfirm" persistent>
+        <v-dialog v-model="showDeleteConfirm" width="400px" persistent>
             <v-card :loading="loading">
                 <v-toolbar density="compact" title="Confirmar remoção" />
                 <v-card-text>
@@ -35,9 +40,9 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn color="error" :disabled="loading" @click="confirmDelete()" variant="tonal">Sim</v-btn>
+                    <v-btn color="error" :disabled="loading" variant="tonal" @click="confirmDelete()">Sim</v-btn>
                     <v-spacer />
-                    <v-btn color="success" :disabled="loading" @click="cancelDelete()" variant="tonal">Não</v-btn>
+                    <v-btn color="success" :disabled="loading" variant="tonal" @click="cancelDelete()">Não</v-btn>
                     <v-spacer />
                 </v-card-actions>
             </v-card>
@@ -141,7 +146,6 @@ function cancelDelete() {
 function editComment() {
     editableComment.value = props.commentary.body
     isEditing.value = true
-    emits("editCommentary", props.commentary)
 }
 function deleteComment() {
     showDeleteConfirm.value = true

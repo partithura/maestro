@@ -19,7 +19,8 @@
                         <div v-html="body" />
                     </v-card-text>
                 </v-card>
-                <CardDeck ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :cant-vote="cantVote"
+                <CardDeck
+ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :cant-vote="cantVote"
                     :loading="loading" />
 
                 <GitChat :issue="issue" />
@@ -27,8 +28,10 @@
             <v-card-actions>
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
                 <v-spacer />
-                <v-btn :disabled="cantVote || loading" :loading="loading" color="success" variant="tonal"
-                    @click="confirmVote">{{ buttonText }}</v-btn>
+                <v-btn
+:disabled="cantVote || loading" :loading="loading" color="success" variant="tonal"
+                    @click="confirmVote">{{
+                        buttonText }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -59,7 +62,7 @@ const title = computed(() => {
     }).value?.raw
 })
 const body = computed(() => {
-    // eslint-disable-next-line no-undef
+     
     return parseGitMD(props.issue?.content?.body, props.issue?.content.repository?.name)
 })
 const issueURL = computed(() => {

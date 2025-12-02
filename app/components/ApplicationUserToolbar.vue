@@ -1,7 +1,7 @@
 <template>
     <v-app-bar elevation="8" density="compact">
         <v-app-bar-title>
-            <v-btn @click="goToRoute('/dashboard')" size="large" slim class="d-flex align-center">
+            <v-btn size="large" slim class="d-flex align-center" @click="goToRoute('/dashboard')">
                 <LogoIcon size="42px" />
                 <span class="ml-4">Maestro</span>
             </v-btn>
@@ -12,7 +12,8 @@
                     <v-avatar v-bind="props" :image="userImageUrl" start />
                 </template>
                 <v-list>
-                    <v-list-item v-for="(item, index) in userMenu" :key="item.route" :value="index"
+                    <v-list-item
+v-for="(item, index) in userMenu" :key="item.route" :value="index"
                         @click="goToRoute(item.route)">
                         <v-list-item-title>{{ item.title }}</v-list-item-title>
                     </v-list-item>

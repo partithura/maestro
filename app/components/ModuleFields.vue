@@ -7,27 +7,32 @@
                         <v-text-field v-model="module.value" :loading="loading" label="Valor do campo" readonly />
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-text-field v-model="module.text" :loading="loading" label="Texto da coluna"
+                        <v-text-field
+v-model="module.text" :loading="loading" label="Texto da coluna"
                             hint="Texto usado na coluna" @update:model-value="updateModule(module)" />
                     </v-col>
                     <v-col cols="12" md="12">
-                        <v-text-field v-model="module.tooltip" :loading="loading" label="Formação da tooltip do módulo"
+                        <v-text-field
+v-model="module.tooltip" :loading="loading" label="Formação da tooltip do módulo"
                             hint="Ainda não está sendo utilizado" @update:model-value="updateModule(module)" />
                     </v-col>
                     <v-col cols="12">
                         <v-card variant="outlined" title="Valores:">
                             <v-card-text class="scrollable">
-                                <v-row align="center" justify="center" dense v-if="module.points.length <= 0">
+                                <v-row v-if="module.points.length <= 0" align="center" justify="center" dense>
                                     <h3 class="text-center">Não há nenhuma pontuação associada.</h3>
                                 </v-row>
-                                <v-row v-for="(point, index) in module.points" :key="point.value" dense>
+                                <v-row v-for="(point) in module.points" :key="point.value" dense>
                                     <v-col>
-                                        <v-number-input v-model="point.value" readonly :loading="loading"
+                                        <v-number-input
+v-model="point.value" readonly :loading="loading"
                                             label="Valor do ponto" />
                                     </v-col>
                                     <v-col>
-                                        <v-text-field @update:model-value="updateModule(module)" :loading="loading"
-                                            v-model="point.text" label="Valor exibido no select" />
+                                        <v-text-field
+v-model="point.text" :loading="loading"
+                                            label="Valor exibido no select"
+                                            @update:model-value="updateModule(module)" />
                                     </v-col>
                                 </v-row>
                             </v-card-text>
@@ -43,18 +48,18 @@
         </v-card-text>
         <v-card-actions>
             <v-spacer />
-            <v-btn @click="confirmDeletion(module)" variant="tonal" color="error">Excluir módulo</v-btn>
+            <v-btn variant="tonal" color="error" @click="confirmDeletion(module)">Excluir módulo</v-btn>
         </v-card-actions>
-        <v-dialog max-width="540px" v-model="confirmModal">
+        <v-dialog v-model="confirmModal" max-width="540px">
             <v-card title="Confirmar exclusão do projeto?">
                 <v-card-text>
                     Deseja mesmo excluir o módulo "{{ module.value }}"?
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer />
-                    <v-btn variant="tonal" @click="confirmModal = false" color="success">Cancelar</v-btn>
+                    <v-btn variant="tonal" color="success" @click="confirmModal = false">Cancelar</v-btn>
                     <v-spacer />
-                    <v-btn variant="tonal" @click="deleteModule" color="error">Excluir</v-btn>
+                    <v-btn variant="tonal" color="error" @click="deleteModule">Excluir</v-btn>
                     <v-spacer />
                 </v-card-actions>
             </v-card>
@@ -126,11 +131,11 @@ function confirmDeletion() {
 }
 
 function deleteModule() {
-    emits("deleting", module.value)
+    emits("start:deleting", module.value)
     loading.value = true
     effortStore.deleteEffortModule(module.value.value)
         .then(r => {
-            emits("deleted", r)
+            emits("success:deleting", r)
         })
         .catch(err => {
             emits("error:deleting", err)

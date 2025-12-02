@@ -1,5 +1,5 @@
 <template>
-    <v-dialog max-width="540px" v-model="addNewAreaModal">
+    <v-dialog v-model="addNewAreaModal" max-width="540px">
         <v-card>
             <v-toolbar>
                 <template #title>
@@ -12,18 +12,20 @@
             <v-card-text>
                 <v-form v-model="isValid">
                     <v-col>
-                        <v-text-field v-model="area.text" validate-on="eager" :rules="[isRequired]" :loading="loading" :disabled="loading"
-                            label="Título"></v-text-field>
+                        <v-text-field
+v-model="area.text" validate-on="eager" :rules="[isRequired]" :loading="loading" :disabled="loading"
+                            label="Título"/>
                     </v-col>
                     <v-col>
-                        <v-text-field v-model="area.value" validate-on="eager" :loading="loading" :rules="[isRequired,isValidVariableName]" :disabled="loading"
-                            label="Valor"></v-text-field>
+                        <v-text-field
+v-model="area.value" validate-on="eager" :loading="loading" :rules="[isRequired,isValidVariableName]" :disabled="loading"
+                            label="Valor"/>
                     </v-col>
                 </v-form>
             </v-card-text>
             <v-card-actions>
                 <v-spacer />
-                <v-btn variant="tonal" :disabled="!isValid" @click="saveArea()" color="success">Salvar</v-btn>
+                <v-btn variant="tonal" :disabled="!isValid" color="success" @click="saveArea()">Salvar</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

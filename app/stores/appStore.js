@@ -68,7 +68,7 @@ export const useAppStore = defineStore("appStore", {
       this.token = "";
       this.cards = [];
       this.projects = [];
-      navigateTo('/login')
+      navigateTo("/login");
     },
     //Cartas
     async fetchCardDeck() {
@@ -88,7 +88,7 @@ export const useAppStore = defineStore("appStore", {
         });
         this.cards = newCardResult;
         return newCardResult;
-      } catch (error) {
+      } catch {
         return false;
       }
     },
@@ -181,7 +181,7 @@ export const useAppStore = defineStore("appStore", {
         this.projects = projects;
         return projects;
       } catch (error) {
-        window.alert(`Erro na appStore.fetchProjects; Error: ${error}`)
+        window.alert(`Erro na appStore.fetchProjects; Error: ${error}`);
         return [];
       }
     },

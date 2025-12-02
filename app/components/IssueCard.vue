@@ -1,11 +1,13 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
     <v-col cols="12" sm="12" md="6" lg="4" xl="3" xxl="2">
-        <v-card :color="prop.isSelected ? 'primary' : ''" variant="outlined" max-height="250px" height="100%"
+        <v-card
+:color="prop.isSelected ? 'primary' : ''" variant="outlined" max-height="250px" height="100%"
             @click="viewIssue">
             <v-toolbar :color="prop.isSelected ? 'primary' : 'grey-darken-4'" density="compact">
                 <template #prepend>
-                    <v-chip class="ml-3" :color="parseColor(prop.issue?.content?.type?.color)" variant="outlined"
+                    <v-chip
+class="ml-3" :color="parseColor(prop.issue?.content?.type?.color)" variant="outlined"
                         density="compact">{{
                             prop.issue?.content?.type?.name }}</v-chip>
                 </template>
@@ -22,10 +24,11 @@
                 </template>
             </v-toolbar>
             <v-card-text class="card-description text-white">
-                <div v-html="mdBody" class="px-3"></div>
+                <div class="px-3" v-html="mdBody"/>
             </v-card-text>
             <v-card-actions class="pb-0 mb-0">
-                <v-chip density="compact" v-for="label in prop.issue.content.labels" :key="label.id"
+                <v-chip
+v-for="label in prop.issue.content.labels" :key="label.id" density="compact"
                     :color="parseColor(label.color)" variant="outlined">{{ label.name }}</v-chip>
             </v-card-actions>
         </v-card>
@@ -44,12 +47,12 @@ const prop = defineProps({
     }
 })
 const mdBody = computed(() => {
-    // eslint-disable-next-line no-undef
+     
     return parseGitMD(prop.issue?.content?.body, prop.issue?.content?.repository?.name)
 })
 
 const issueTitle = computed(() => {
-    // eslint-disable-next-line no-undef
+     
     return parseGitMD(prop.issue?.fields[0]?.value?.html, prop.issue?.content?.repository?.name)
 })
 const rawIssueTitle = computed(() => {

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
     <div class="new-commentary-tabs-container">
         <v-tabs v-model="tab">
@@ -10,8 +11,9 @@
                 <div class="new-comentary-tab">
                     <v-tabs-window v-model="tab">
                         <v-tabs-window-item value="edit">
-                            <v-textarea :loading="loading" :disabled="loading" label="Adicionar comentário"
-                                v-model="content" variant="outlined" />
+                            <v-textarea
+v-model="content" :loading="loading" :disabled="loading"
+                                label="Adicionar comentário" variant="outlined" />
                         </v-tabs-window-item>
                         <v-tabs-window-item value="preview">
                             <div class="tab-preview">
@@ -77,7 +79,7 @@ const content = ref()
 const loading = ref(false)
 const tab = ref('edit')
 const formatedContent = computed(() => {
-    // eslint-disable-next-line no-undef
+
     return content.value ? parseGitMD(content.value, props.issue?.content?.repository?.name) : ''
 })
 </script>
