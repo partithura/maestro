@@ -1,15 +1,16 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
-    <v-dialog persistent max-width="1240px" v-model="model">
+    <v-dialog v-model="model" persistent max-width="1240px">
         <v-card>
             <v-toolbar>
                 <template #title>
                     <span class="issue-link">
-                        <span v-html="title" class="mr-2" />
+                        <span class="mr-2" v-html="title" />
                         <a :href="issueURL" target="_blank">#{{ issue.content.number }}</a>
                     </span>
                 </template>
                 <template #append>
-                    <v-icon icon="mdi-close" @click="closeModal"></v-icon>
+                    <v-icon icon="mdi-close" @click="closeModal" />
                 </template>
             </v-toolbar>
             <v-card-text class="scrollable">
@@ -18,28 +19,24 @@
                         <div v-html="body" />
                     </v-card-text>
                 </v-card>
-                <CardDeck ref="cardDeck" :votes="databaseIssue?.votes" :cantVote="cantVote" :loading="loading"
-                    v-model="selectedCard" />
+                <CardDeck ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :cant-vote="cantVote"
+                    :loading="loading" />
 
                 <GitChat :issue="issue" />
             </v-card-text>
             <v-card-actions>
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
                 <v-spacer />
-                <v-btn :disabled="cantVote || loading" :loading="loading" @click="confirmVote" color="success"
-                    variant="tonal">{{
-                        buttonText
-                    }}</v-btn>
+                <v-btn :disabled="cantVote || loading" :loading="loading" color="success" variant="tonal"
+                    @click="confirmVote">{{ buttonText }}</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
 <script setup>
 import { useAppStore, useIssuesStore } from '#imports'
-import MarkdownIt from 'markdown-it';
 const appStore = useAppStore()
 const issuesStore = useIssuesStore()
-const md = new MarkdownIt();
 const props = defineProps({
     issue: {
         type: Object,
@@ -62,7 +59,8 @@ const title = computed(() => {
     }).value?.raw
 })
 const body = computed(() => {
-    return md.render(props.issue?.content?.body)
+    // eslint-disable-next-line no-undef
+    return parseGitMD(props.issue?.content?.body, props.issue?.content.repository?.name)
 })
 const issueURL = computed(() => {
     return props.issue?.content?.html_url
@@ -133,12 +131,14 @@ watch(model, async (n, o) => {
 <style lang="scss" scoped>
 .issue-link {
     font-size: 1.75rem;
-    a{
+
+    a {
         color: gray;
         text-decoration: none;
     }
 }
-.scrollable{
+
+.scrollable {
     max-height: calc(100vh - 100px);
     overflow-y: scroll;
 }

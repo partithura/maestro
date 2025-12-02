@@ -1,6 +1,6 @@
 <template>
-    <v-container>
+    <div>
         <ApplicationUserToolbar />
             <slot />
-    </v-container>
+    </div>
 </template>

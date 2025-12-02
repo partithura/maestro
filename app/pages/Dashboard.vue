@@ -1,54 +1,44 @@
 <template>
-    <v-container>
-        <v-card :loading="loading" color="black">
-            <v-card-title class="px-0 pt-0">
-                <v-toolbar>
-                    <template #title>
-                        Histórias aguardando seu voto
-                    </template>
-                    <v-text-field v-if="isManagement" label="Query" v-model="query" hide-details density="compact"
-                        @update:model-value="updateQuery()" />
-                    <template #append>
-                        <v-tooltip location="top">
-                            <template #activator="{props}">
-                                <v-btn v-bind="props" icon="mdi-refresh" @click="loadIssues()"></v-btn>
-                            </template>
-                            Recarregar conteúdo
-                        </v-tooltip>
-                    </template>
-                </v-toolbar>
-            </v-card-title>
-            <v-card-text class="scrollable-content">
-                <v-skeleton-loader v-if="loading" width="100%" height="240px" />
-                <v-row v-else-if="issues?.length">
-                    <IssueCard v-for="issue in issues" :key="issue.id" :issue="issue" @click="viewIssue" />
-                </v-row>
-                <div v-else class="no-results">
-                    <div @click="testLink" :class="{ clickable: isManagement }">
-                        <h3>{{ noResultsMessage }}</h3>
-                        <h5>{{ noResultsHint }}</h5>
-                    </div>
+    <div>
+        <v-skeleton-loader v-if="loading" width="100%" height="80vh" />
+        <div v-else-if="issues?.length" class="scrollable-content">
+            <v-row>
+                <IssueCard v-for="issue in issues" :is-selected="selectedIssue?.id == issue.id" :key="issue.id"
+                    :issue="issue" @click="viewIssue" />
+            </v-row>
+        </div>
+        <div v-else class="no-results">
+            <div @click="testLink" :class="{ clickable: isManagement }">
+                <h3>{{ noResultsMessage }}</h3>
+                <h5>{{ noResultsHint }}</h5>
+            </div>
+        </div>
+        <v-footer app absolute>
+            <v-tooltip location="top">
+                <template #activator="{ props }">
+                    <v-btn v-bind="props" icon="mdi-refresh" @click="loadIssues()"></v-btn>
+                </template>
+                Recarregar conteúdo
+            </v-tooltip>
+            <v-text-field v-if="isManagement" label="Query" v-model="query" hide-details density="compact"
+                @update:model-value="updateQuery()" variant="outlined" />
+
+            <v-spacer />
+            <v-select max-width="150px" label="Itens por página" v-model="paginationSize" :items="paginationSizes"
+                hide-details density="compact" variant="outlined" />
+            <div class="controls">
+                <div class="navigation-buttons">
+                    <v-btn variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
+                        icon="mdi-arrow-left" @click="loadPrevPage" />
                 </div>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer />
-                <v-spacer />
-                <v-select max-width="150px" label="Itens por página" v-model="paginationSize" :items="paginationSizes"
-                    hide-details density="compact" />
-                <div class="controls">
-                    <div class="navigation-buttons">
-                        <v-btn variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
-                            icon="mdi-arrow-left" @click="loadPrevPage" />
-                    </div>
-                    <div class="navigation-buttons">
-                        <v-btn variant="outlined" :loading="loading && nextArrow" :disabled="!nextArrow"
-                            icon="mdi-arrow-right" @click="loadNextPage" />
-                    </div>
+                <div class="navigation-buttons">
+                    <v-btn variant="outlined" :loading="loading && nextArrow" :disabled="!nextArrow"
+                        icon="mdi-arrow-right" @click="loadNextPage" />
                 </div>
-            </v-card-actions>
-        </v-card>
+            </div>
+        </v-footer>
         <IssueModal v-model="showIssueModal" :issue="selectedIssue" @confirmVote="confirmVote" />
-    </v-container>
+    </div>
 </template>
 
 <script setup>
@@ -59,8 +49,9 @@ const loading = ref(true)
 const paginationSizes = ref([12, 24, 32])
 const paginationSize = ref(12)
 const isManagement = computed(() => {
-    return appStore.getCurrentUserInfo.isManagement
+    return user.value.isManagement
 })
+// eslint-disable-next-line no-undef
 definePageMeta({
     layout: 'app',
 })
@@ -104,7 +95,7 @@ const noResultsMessage = computed(() => {
     return appStore.getActiveProject.number ? 'Não há tasks para votação ou o filtro não retornou nenhuma task.' : 'Não há projeto ativo no momento.'
 })
 const noResultsHint = computed(() => {
-    return appStore.getCurrentUserInfo.isManagement ? 'Clique aqui para abrir a página de configurações.' : 'Aguarde um administrador do projeto configurar um projeto ativo.'
+    return user.value.isManagement ? 'Clique aqui para abrir a página de configurações.' : 'Aguarde um administrador do projeto configurar um projeto ativo.'
 })
 
 const nextArrow = computed(() => {
@@ -146,7 +137,7 @@ watch(paginationSize, () => {
 function loadIssues(direction = "") {
     loading.value = true
     let promises = []
-    if (!appStore.getCurrentUserInfo.login) {
+    if (!user.value.login) {
         const token = useCookie('token').value
         promises.push(appStore.checkToken(token))
     }
@@ -180,6 +171,13 @@ function loadIssues(direction = "") {
 </script>
 
 <style lang="scss" scoped>
+.missing-vuetify-app-footer {
+    position: absolute !important;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+}
+
 .no-results {
     display: flex;
     justify-content: center;
@@ -198,7 +196,8 @@ function loadIssues(direction = "") {
 
 .scrollable-content {
     overflow-y: scroll;
-    max-height: calc(100vh - 270px);
+    max-height: calc(100vh - 116px);
+    padding: 16px 64px;
 }
 
 .navigation-buttons {

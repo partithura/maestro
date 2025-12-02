@@ -24,6 +24,9 @@ function findLinks(text,repository) {
   });
 }
 function parseGitMD(markdown, repository){
+  if(!markdown){
+    return ''
+  }
   return md.render(findLinks(findMentions(markdown),repository))
 }
 function isValidVariableName(name) {

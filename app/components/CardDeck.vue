@@ -27,7 +27,7 @@
         <v-col cols="12">
           <v-row justify="center" align="center">
             <v-col cols="12" md="6" xl="3">
-              <v-card variant="outlined" :color="result.isFinal ? 'success' : 'warning'" elevation="12">
+              <v-card variant="outlined" class="mb-4" :color="result.isFinal ? 'success' : 'warning'" elevation="12">
                 <v-toolbar>
                   <template #title>
                     Resultado:

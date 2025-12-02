@@ -1,5 +1,5 @@
 <template>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="64px" height="64px">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" :width="props.size" :height="props.size">
         <path :style="`stroke-width: 1; fill: ${props.fill}; stroke: rgba(0, 0, 0, 0);`"
             d="M 436.324 421.14 L 367.283 421.14 L 367.283 374.395 L 342.021 421.14 L 157.978 421.14 L 132.716 374.395 L 132.716 421.14 L 63.675 421.14 L 63.675 80.319 L 129.41 80.319 L 129.41 78.861 L 130.08 80.319 L 131.639 80.319 L 131.639 83.718 L 249.999 341.602 L 368.36 83.718 L 368.36 80.319 L 369.92 80.319 L 370.59 78.861 L 370.59 80.319 L 436.324 80.319 L 436.324 421.14 Z">
         </path>
@@ -13,6 +13,10 @@ const props = defineProps({
     fill: {
         type: String,
         default: '#FFFFFF'
+    },
+    size:{
+        type: String,
+        default:'64px'
     }
 })
 </script>
