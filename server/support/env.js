@@ -1,18 +1,34 @@
+import { config } from "dotenv"
 import { z } from "zod"
 
-import { config } from "dotenv"
 config()
 
+const IS_BUILD = process.env.NUXT_BUILD === 'true' || process.env.NUXT_BUILD === true
+
+const ADMIN_TEAM_NAME_SCHEMA = IS_BUILD
+  ? z.string().default("senior")
+  : z.string()
+
+const ORGANIZATION_NAME_SCHEMA = IS_BUILD
+  ? z.string().default("partithura")
+  : z.string()
+
+const MONGODB_HOST_SCHEMA = IS_BUILD
+  ? z.string().default("mock-host-build")
+  : z.string().optional()
+
+const MONGODB_URL_SCHEMA = z.string().optional()
+
 const envSchema = z.object({
-  MONGODB_URL: z.string().optional(), // A string completa é opcional
-  MONGODB_HOST: z.string().optional(), // O host é opcional
-  MONGODB_PORT: z.string().default("27017"), // A porta mantém o valor padrão se MONGODB_HOST for usado
+  MONGODB_URL: MONGODB_URL_SCHEMA,
+  MONGODB_HOST: MONGODB_HOST_SCHEMA,
+  MONGODB_PORT: z.string().default("27017"),
   MONGODB_USERNAME: z.string().default("user"),
   MONGODB_PASSWORD: z.string().default("password"),
   MONGODB_DATABASE: z.string().default("maestro"),
   MONGODB_AUTH_SOURCE: z.string().default("admin"),
-  ADMIN_TEAM_NAME: z.string().default("senior"),
-  ORGANIZATION_NAME: z.string().default("partithura"),
+  ADMIN_TEAM_NAME: ADMIN_TEAM_NAME_SCHEMA,
+  ORGANIZATION_NAME: ORGANIZATION_NAME_SCHEMA,
   NODE_ENV: z.enum(['development', 'production', 'testing']).default('development')
 }).superRefine((data, ctx) => {
   if (!data.MONGODB_URL && !data.MONGODB_HOST) {
