@@ -1,6 +1,5 @@
 import { Octokit } from "octokit";
 const config = useRuntimeConfig();
-const ADMIN_TEAM_NAME = config.adminTeamName;
 const ORGANIZATION_NAME = config.organizationName;
 
 const publicRoutes = [
@@ -8,10 +7,11 @@ const publicRoutes = [
   "/api/effort/modules/list",
   "/api/user/github",
   "/configuration",
-  "/",
   "/dashboard",
+  "/kanban",
   "/login",
-  ""
+  "/",
+  "",
 ];
 
 export default defineEventHandler(async (event) => {
@@ -21,21 +21,15 @@ export default defineEventHandler(async (event) => {
   if (publicRoutes.some((route) => url === route)) {
     return;
   }
-//https://api.github.com/orgs/partithura/projectsV2/14/items?q=type%3ATask%20status%3AVoting&per_page=12
+
   if (!token) {
     throw createError({
       statusCode: 400,
       statusMessage: "Token não fornecido",
     });
   }
-//   if (!username) {
-//     throw createError({
-//       statusCode: 403,
-//       statusMessage: "Nome de usuário necessário",
-//     });
-//   }
 
-  const isValid = await validateToken(token, username); // sua lógica aqui
+  const isValid = await validateToken(token, username);
   if (!isValid) {
     throw createError({
       statusCode: 418,
@@ -44,22 +38,20 @@ export default defineEventHandler(async (event) => {
   }
 });
 
-// Função de validação (pode ser importada de outro arquivo)
 async function validateToken(token, username) {
   const octokit = new Octokit({
     auth: token,
   });
   try {
     const response = await octokit.request(
-      "GET /orgs/{org}/teams/{team_slug}/memberships/{username}",
+      "GET /orgs/{org}/members/{username}",
       {
-        username:username,
-        team_slug: ADMIN_TEAM_NAME,
         org: ORGANIZATION_NAME,
+        username: username,
       }
     );
 
-    return response.data.state=='active';
+    return response.status == 204;
   } catch (err) {
     throw createError({
       statusCode: 401,
