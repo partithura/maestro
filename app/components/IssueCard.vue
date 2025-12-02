@@ -24,7 +24,7 @@ class="ml-3" :color="parseColor(prop.issue?.content?.type?.color)" variant="outl
                 </template>
             </v-toolbar>
             <v-card-text class="card-description text-white">
-                <div class="px-3" v-html="mdBody"/>
+                <div class="px-3" v-html="mdBody" />
             </v-card-text>
             <v-card-actions class="pb-0 mb-0">
                 <v-chip
@@ -47,12 +47,12 @@ const prop = defineProps({
     }
 })
 const mdBody = computed(() => {
-     
+
     return parseGitMD(prop.issue?.content?.body, prop.issue?.content?.repository?.name)
 })
 
 const issueTitle = computed(() => {
-     
+
     return parseGitMD(prop.issue?.fields[0]?.value?.html, prop.issue?.content?.repository?.name)
 })
 const rawIssueTitle = computed(() => {
@@ -99,6 +99,7 @@ function parseColor(colorStr = '') {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 4;
+    line-clamp: 4;
     overflow: hidden;
     text-overflow: ellipsis;
 }
