@@ -19,7 +19,8 @@
                         <div v-html="body" />
                     </v-card-text>
                 </v-card>
-                <CardDeck ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :is-ready="isReady"
+                <CardDeck
+ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :is-ready="isReady"
                     :cant-vote="cantVote" :loading="loading" />
 
                 <GitChat :issue="issue" />
@@ -27,7 +28,8 @@
             <v-card-actions>
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
                 <v-spacer />
-                <v-btn :disabled="cantVote || loading || !isReady" :loading="loading" color="success" variant="tonal"
+                <v-btn
+:disabled="cantVote || loading || !isReady" :loading="loading" color="success" variant="tonal"
                     @click="confirmVote">{{
                         buttonText }}</v-btn>
             </v-card-actions>

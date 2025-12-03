@@ -1,5 +1,6 @@
 <template>
-  <v-card :variant="isManagement ? 'outlined' : 'flat'" :loading="props.loading" class="mb-4" :disabled="props.loading"
+  <v-card
+:variant="isManagement ? 'outlined' : 'flat'" :loading="props.loading" class="mb-4" :disabled="props.loading"
     :color="isManagement ? 'white' : 'green-darken-4'" title="Votação:">
     <v-card-text class="mt-6 pb-2 pt-2">
       <v-row v-if="isManagement" align="center" justify="center">
@@ -46,7 +47,8 @@
         <h4 v-if="cantVote" class="mb-12">Não há cartas suficientes definidas nas configurações</h4>
         <template v-else>
           <v-col v-for="card in cards" :key="card.value" cols="6" md="1">
-            <PokerCard :loading="props.loading" :selected="card.value === model" :card-value="card.value"
+            <PokerCard
+:loading="props.loading" :selected="card.value === model" :card-value="card.value"
               :color="card.color" :minimum-value="card.minimumValue" :maximum-value="card.maximumValue"
               @click="selectCard" />
           </v-col>

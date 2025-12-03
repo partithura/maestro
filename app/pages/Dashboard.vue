@@ -3,7 +3,8 @@
         <v-skeleton-loader v-if="loading" width="100%" height="80vh" />
         <div v-else-if="issues?.length" class="scrollable-content">
             <v-row>
-                <IssueCard v-for="issue in issues" :key="issue.id" :is-selected="selectedIssue?.id == issue.id"
+                <IssueCard
+v-for="issue in issues" :key="issue.id" :is-selected="selectedIssue?.id == issue.id"
                     :issue="issue" @click="viewIssue" />
             </v-row>
         </div>
@@ -20,19 +21,23 @@
                 </template>
                 Recarregar conteúdo
             </v-tooltip>
-            <v-text-field v-if="isManagement" v-model="query" label="Query" hide-details density="compact"
+            <v-text-field
+v-if="isManagement" v-model="query" label="Query" hide-details density="compact"
                 variant="outlined" @update:model-value="updateQuery()" />
             <v-checkbox v-model="filterVoted" hide-details label="Apenas tasks sem voto?" />
             <v-spacer />
-            <v-select v-model="paginationSize" max-width="150px" label="Itens por página" :items="paginationSizes"
+            <v-select
+v-model="paginationSize" max-width="150px" label="Itens por página" :items="paginationSizes"
                 hide-details density="compact" variant="outlined" />
             <div class="controls">
                 <div class="navigation-buttons">
-                    <v-btn variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
+                    <v-btn
+variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
                         icon="mdi-arrow-left" @click="loadPrevPage" />
                 </div>
                 <div class="navigation-buttons">
-                    <v-btn variant="outlined" :loading="loading && nextArrow" :disabled="!nextArrow"
+                    <v-btn
+variant="outlined" :loading="loading && nextArrow" :disabled="!nextArrow"
                         icon="mdi-arrow-right" @click="loadNextPage" />
                 </div>
             </div>

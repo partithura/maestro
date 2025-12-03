@@ -4,7 +4,8 @@
         <v-card :color="cardColor" variant="outlined" max-height="250px" height="100%" @click="viewIssue">
             <v-toolbar :color="prop.isSelected ? 'primary' : 'grey-darken-4'" density="compact">
                 <template #prepend>
-                    <v-chip class="ml-3" :color="parseColor(prop.issue?.content?.type?.color)" variant="outlined"
+                    <v-chip
+class="ml-3" :color="parseColor(prop.issue?.content?.type?.color)" variant="outlined"
                         density="compact">{{
                             prop.issue?.content?.type?.name }}</v-chip>
                 </template>
@@ -24,7 +25,8 @@
                 <div class="px-3" v-html="mdBody" />
             </v-card-text>
             <v-card-actions class="pb-0 mb-0">
-                <v-chip v-for="label in prop.issue.content.labels" :key="label.id" density="compact"
+                <v-chip
+v-for="label in prop.issue.content.labels" :key="label.id" density="compact"
                     :color="parseColor(label.color)" variant="outlined">{{ label.name }}</v-chip>
             </v-card-actions>
         </v-card>
