@@ -49,6 +49,32 @@ export const useAppStore = defineStore("appStore", {
         return false;
       }
     },
+    async updatePrefs(prefs) {
+      const githubToken = useCookie("token");
+      if (!githubToken.value) {
+        this.updateCurrentToken(null);
+        throw new Error("Nenhum token disponível.");
+      }
+
+      try {
+        const updatedUser = await $fetch("/api/user/update", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${githubToken.value}`,
+            username: this.getCurrentUserInfo.login,
+          },
+          body: {
+            prefs: prefs,
+            id: this.getCurrentUserInfo.id,
+          },
+        });
+        this.userInfo.prefs = updatedUser.data.prefs;
+        return updatedUser.data;
+      } catch (error) {
+        console.error("Erro ao atualizar usuário:", error);
+        throw error;
+      }
+    },
     async checkToken(token) {
       const user = await $fetch("/api/user/github", {
         method: "GET",
