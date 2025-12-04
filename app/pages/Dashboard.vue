@@ -32,10 +32,12 @@
             </v-tooltip>
             <v-text-field v-if="isManagement" v-model="query" label="Query" hide-details density="compact"
                 variant="outlined" @update:model-value="updateQuery()" />
-            <v-checkbox v-model="filterVoted" hide-details label="Apenas tasks sem voto?" />
+            <v-checkbox v-model="filterVoted" hide-details label="Apenas tasks sem seu voto?"
+                @update:model-value="saveOptions()" />
             <v-spacer />
             <v-select v-model="paginationSize" return-object item-value="value" item-title="value" max-width="150px"
-                label="Itens por página" :items="paginationSizes" hide-details density="compact" variant="outlined" />
+                label="Itens por página" :items="paginationSizes" hide-details density="compact" variant="outlined"
+                @update:model-value="saveOptions()" />
             <div class="controls">
                 <div class="navigation-buttons">
                     <v-btn variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
@@ -56,7 +58,14 @@ import { useAppStore, useIssuesStore } from '#imports'
 const appStore = useAppStore();
 const issuesStore = useIssuesStore()
 const loading = ref(true)
-const filterVoted = ref(false)
+const filterVoted = computed({
+    get() {
+        return prefs.value?.only_filtered_items
+    },
+    set(v) {
+        appStore.userInfo.prefs.only_filtered_items = v
+    }
+})
 const paginationSizes = ref([
     {
         id: 0,
@@ -196,7 +205,6 @@ function saveOptions() {
 }
 
 watch(paginationSize, () => {
-    saveOptions()
     loadIssues()
 })
 

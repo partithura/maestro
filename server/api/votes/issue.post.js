@@ -39,6 +39,7 @@ export default defineEventHandler(async (event) => {
         updated_at: issue.updated_at,
         archived_at: issue.archived_at,
         item_url: issue.item_url,
+        show_votes: false,
         votes: [
           {
             user: user,
@@ -74,7 +75,7 @@ export default defineEventHandler(async (event) => {
       );
     }
   } catch (error) {
-    return `Não foi possível executar a operação: ${error.message}`
+    return `Não foi possível executar a operação: ${error.message}`;
   }
-  return 'Criado com sucesso'
+  return "Criado com sucesso";
 });

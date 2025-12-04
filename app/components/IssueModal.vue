@@ -19,16 +19,17 @@
                         <div v-html="body" />
                     </v-card-text>
                 </v-card>
+                show votes: {{ showVotes }}
                 <CardDeck ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :is-ready="isReady"
-                    :cant-vote="cantVote" :loading="loading" />
+                    :cant-vote="cantVote" :loading="loading" :show-votes="showVotes" />
 
                 <GitChat :issue="issue" />
             </v-card-text>
             <v-card-actions>
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
                 <v-spacer />
-                <v-btn v-if="isManagement" :disabled="loading || !isReady" :loading="loading" color="primary"
-                    variant="tonal" @click="savePoints">Salvar Dificuldade</v-btn>
+                <v-btn v-if="isManagement" :disabled="loading" :loading="loading" color="primary" variant="tonal"
+                    @click="savePoints">{{ isReady ? 'Salvar Dificuldade' : 'Exibir votos' }}</v-btn>
                 <v-btn :disabled="cantVote || loading" :loading="loading" color="success" variant="tonal"
                     @click="confirmVote">Confirmar voto</v-btn>
             </v-card-actions>
@@ -47,6 +48,9 @@ const props = defineProps({
 })
 const cantVote = computed(() => {
     return appStore.getCardDeck.length <= 1
+})
+const showVotes = computed(() => {
+    return props.issue.show_votes
 })
 const emits = defineEmits([
     "confirmVote",
@@ -106,22 +110,32 @@ function confirmVote() {
 }
 
 function savePoints() {
-    issuesStore.updateIssueEffort({
-        issue: props.issue,
-        value: Number(cardDeck.value?.result?.value)
-    })
-        .then(r => {
-            emits("success:voting")
-            if (r) {
-                closeModal()
-            }
+    if (isReady.value) {
+        issuesStore.updateIssueEffort({
+            issue: props.issue,
+            value: Number(cardDeck.value?.result?.value)
         })
-        .catch(e => {
-            emits("error:voting", e)
-        }).finally(() => {
-            loading.value = false
-            emits("end:voting")
-        })
+            .then(r => {
+                emits("success:voting")
+                if (r) {
+                    closeModal()
+                }
+            })
+            .catch(e => {
+                emits("error:voting", e)
+            }).finally(() => {
+                loading.value = false
+                emits("end:voting")
+            })
+    } else {
+        issuesStore.showCards(props.issue)
+            .then(r => {
+                console.log("Response:", r)
+            })
+            .catch(e => {
+                console.log("Error:", e)
+            })
+    }
 }
 
 watch(model, async (n, o) => {
