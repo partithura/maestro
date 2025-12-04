@@ -57,6 +57,7 @@ export const useIssuesStore = defineStore("issuesStore", {
         return {
           ...issue,
           votes: mongoData?.votes || [],
+          show_votes: mongoData?.show_votes,
         };
       });
     },
@@ -76,6 +77,31 @@ export const useIssuesStore = defineStore("issuesStore", {
     },
     setCurrentLinks(v) {
       this.links = v;
+    },
+    async showCards(issue) {
+      const user = useAppStore().getCurrentUserInfo.login;
+      const githubToken = useCookie("token");
+      if (!githubToken.value) {
+        throw new Error("Nenhum token disponível.");
+      }
+
+      try {
+        const response = await $fetch("/api/votes/update", {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${githubToken.value}`,
+            "Content-Type": "application/json",
+            username: user,
+          },
+          body: {
+            issue: issue,
+          },
+        });
+        return response;
+      } catch (error) {
+        console.error("Erro ao salvar issues no mongodb:", error);
+        throw error;
+      }
     },
     async fetchIssues(filters, pagination = null) {
       const user = useAppStore().getCurrentUserInfo.login;

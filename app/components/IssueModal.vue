@@ -19,19 +19,19 @@
                         <div v-html="body" />
                     </v-card-text>
                 </v-card>
-                <CardDeck
-ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :is-ready="isReady"
-                    :cant-vote="cantVote" :loading="loading" />
+                show votes: {{ showVotes }}
+                <CardDeck ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :is-ready="isReady"
+                    :cant-vote="cantVote" :loading="loading" :show-votes="showVotes" />
 
                 <GitChat :issue="issue" />
             </v-card-text>
             <v-card-actions>
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
                 <v-spacer />
-                <v-btn
-:disabled="cantVote || loading || !isReady" :loading="loading" color="success" variant="tonal"
-                    @click="confirmVote">{{
-                        buttonText }}</v-btn>
+                <v-btn v-if="isManagement" :disabled="loading" :loading="loading" color="primary" variant="tonal"
+                    @click="savePoints">{{ isReady ? 'Salvar Dificuldade' : 'Exibir votos' }}</v-btn>
+                <v-btn :disabled="cantVote || loading" :loading="loading" color="success" variant="tonal"
+                    @click="confirmVote">Confirmar voto</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>
@@ -48,6 +48,9 @@ const props = defineProps({
 })
 const cantVote = computed(() => {
     return appStore.getCardDeck.length <= 1
+})
+const showVotes = computed(() => {
+    return props.issue.show_votes
 })
 const emits = defineEmits([
     "confirmVote",
@@ -68,7 +71,6 @@ const title = computed(() => {
     }).value?.raw
 })
 const body = computed(() => {
-
     return parseGitMD(props.issue?.content?.body, props.issue?.content.repository?.name)
 })
 const issueURL = computed(() => {
@@ -77,25 +79,38 @@ const issueURL = computed(() => {
 const user = computed(() => {
     return appStore.getCurrentUserInfo
 })
+const isManagement = computed(() => {
+    return user.value.isManagement
+})
 function closeModal() {
     selectedCard.value = null
     model.value = false
 }
-const buttonText = computed(() => {
-    return user.value.isManagement ? "Definir Dificuldade Consolidada" : "Confirmar voto"
-})
+
 const isReady = computed(() => {
-    if (user.value.isManagement) {
+    if (isManagement.value) {
         return cardDeck.value?.result?.isFinal
     }
     return true
 })
 
 function confirmVote() {
-    //verificar se o usuário é management e decidir se salva no git ou no mongo
     emits("start:voting")
     loading.value = true
-    if (user.value.isManagement && typeof cardDeck.value?.result?.isFinal) {
+    if (appStore) {
+        emits("confirmVote", {
+            issue: props.issue,
+            vote: selectedCard.value,
+            user: user.value
+        })
+        loading.value = false
+        closeModal()
+        emits("end:voting")
+    }
+}
+
+function savePoints() {
+    if (isReady.value) {
         issuesStore.updateIssueEffort({
             issue: props.issue,
             value: Number(cardDeck.value?.result?.value)
@@ -112,15 +127,14 @@ function confirmVote() {
                 loading.value = false
                 emits("end:voting")
             })
-    } else if (appStore) {
-        emits("confirmVote", {
-            issue: props.issue,
-            vote: selectedCard.value,
-            user: user.value
-        })
-        loading.value = false
-        closeModal()
-        emits("end:voting")
+    } else {
+        issuesStore.showCards(props.issue)
+            .then(r => {
+                console.log("Response:", r)
+            })
+            .catch(e => {
+                console.log("Error:", e)
+            })
     }
 }
 

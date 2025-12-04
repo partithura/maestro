@@ -32,10 +32,12 @@
             </v-tooltip>
             <v-text-field v-if="isManagement" v-model="query" label="Query" hide-details density="compact"
                 variant="outlined" @update:model-value="updateQuery()" />
-            <v-checkbox v-model="filterVoted" hide-details label="Apenas tasks sem voto?" />
+            <v-checkbox v-model="filterVoted" hide-details label="Apenas tasks sem seu voto?"
+                @update:model-value="saveOptions()" />
             <v-spacer />
-            <v-select v-model="paginationSize" max-width="150px" label="Itens por página" :items="paginationSizes"
-                hide-details density="compact" variant="outlined" />
+            <v-select v-model="paginationSize" return-object item-value="value" item-title="value" max-width="150px"
+                label="Itens por página" :items="paginationSizes" hide-details density="compact" variant="outlined"
+                @update:model-value="saveOptions()" />
             <div class="controls">
                 <div class="navigation-buttons">
                     <v-btn variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
@@ -56,9 +58,41 @@ import { useAppStore, useIssuesStore } from '#imports'
 const appStore = useAppStore();
 const issuesStore = useIssuesStore()
 const loading = ref(true)
-const filterVoted = ref(false)
-const paginationSizes = ref([12, 24, 32])
-const paginationSize = ref(12)
+const filterVoted = computed({
+    get() {
+        return prefs.value?.only_filtered_items
+    },
+    set(v) {
+        appStore.userInfo.prefs.only_filtered_items = v
+    }
+})
+const paginationSizes = ref([
+    {
+        id: 0,
+        value: 12,
+    },
+    {
+        id: 1,
+        value: 24,
+    },
+    {
+        id: 2,
+        value: 32,
+    },
+])
+const paginationSize = computed({
+    get() {
+        return paginationSizes.value.find(p => {
+            return p.id == prefs.value?.items_per_page_option
+        })
+    },
+    set(v) {
+        appStore.userInfo.prefs.items_per_page_option = v.id
+    }
+})
+const prefs = computed(() => {
+    return appStore.getCurrentUserInfo.prefs
+})
 const isManagement = computed(() => {
     return user.value.isManagement
 })
@@ -158,6 +192,17 @@ async function updateQuery() {
         loadIssues();
     }, 1000)
 }
+function saveOptions() {
+    appStore.updatePrefs(
+        {
+            items_per_page_option: paginationSize.value.id,
+            only_filtered_items: filterVoted.value
+        }
+    )
+        .catch(e => {
+            console.log("Erro:", e)
+        })
+}
 
 watch(paginationSize, () => {
     loadIssues()
@@ -183,7 +228,7 @@ function loadIssues(direction = "") {
                         const filters = {
                             org: "partithura",
                             projectNumber: appStore.getActiveProject.number,
-                            paginationSize: paginationSize.value,//ver isso
+                            paginationSize: paginationSize.value.value,//ver isso
                             q: query.value
                         }
                         fetchPromises = [
