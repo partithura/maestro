@@ -7,24 +7,29 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event);
   try {
-    const exists = await Project.exists({ number: body.number });
+    const exists = await Project.exists({ _id: body._id });
     if (!exists) {
       throw createError({
         statusCode: 400,
         message: "Projeto não encontrado",
       });
     } else {
-      const newProject = Project.updateMany(
+      const newProject = await Project.updateMany(
         {
-          number: {
-            $ne: body.number
+          _id: {
+            $ne: body._id,
           },
         },
         {
-          $set: { isActive: false }
+          $set: { isActive: false },
         }
       );
-      return newProject;
+      const updatedProject = await Project.findOneAndUpdate(
+        { _id: body._id },
+        body
+      );
+
+      return { uncheckedProjects: newProject, updatedProject: updatedProject };
     }
   } catch (error) {
     throw createError({

@@ -1,16 +1,18 @@
 <template>
     <v-card>
         <v-card-title>
+            {{ tab }}
             <v-skeleton-loader v-if="loading" type="card" />
             <template v-else>
                 <div v-if="!modules.length">
-                    <v-btn variant="flat" size="x-large" @click.stop.prevent="openNewModuleModal">
+                    <v-btn variant="flat" base-color="grey" size="x-large" @click.stop.prevent="openNewModuleModal">
                         <v-icon size="36px">mdi-plus</v-icon>
                     </v-btn>
                     <span>Nenhum módulo existente</span>
                 </div>
                 <v-tabs v-else v-model="tab" :disabled="loading" color="primary">
-                    <v-tab v-for="module in modules" :key="module.value" :value="module.value">
+                    <v-tab :variant="module._id == tab ? 'flat' : 'tonal'" v-for="module in modules" base-color="grey"
+                        :key="module._id" :value="module._id">
                         {{ module.value }}
                     </v-tab>
                     <v-btn variant="flat" size="x-large" @click.stop.prevent="openNewModuleModal">
@@ -22,7 +24,7 @@
         <v-card-text>
             <v-skeleton-loader v-if="loading" type="article" />
             <v-tabs-window v-else v-model="tab">
-                <v-tabs-window-item v-for="(module,index) in modules" :key="module.value" :value="module.value">
+                <v-tabs-window-item v-for="(module, index) in modules" :key="module._id" :value="module._id">
                     <ModuleFields v-model="modules[index]" />
                 </v-tabs-window-item>
             </v-tabs-window>
@@ -44,12 +46,12 @@ const modules = computed(() => {
     return effortStore.getEffortModules ?? []
 })
 
-function loadItems(){
-    loading.value=true
+function loadItems() {
+    loading.value = true
     effortStore.readEffortModules()
-    .finally(()=>{
-        loading.value=false
-    })
+        .finally(() => {
+            loading.value = false
+        })
 }
 
 

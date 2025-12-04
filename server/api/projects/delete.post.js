@@ -6,9 +6,9 @@ export default defineEventHandler(async (event) => {
   await mongoose.connect(env.MONGODB_CONNECTION_STRING);
 
   const body = await readBody(event);
-  const { number } = body;
+  const { id } = body;
   try {
-    const response = await Project.findOneAndDelete({ number: number });
+    const response = await Project.findOneAndDelete({ _id: id });
     return response;
   } catch (error) {
     throw createError({

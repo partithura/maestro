@@ -1,19 +1,28 @@
 <template>
     <div>
-        <v-skeleton-loader v-if="loading" width="100%" height="80vh" />
-        <div v-else-if="issues?.length" class="scrollable-content">
-            <v-row>
-                <IssueCard
-v-for="issue in issues" :key="issue.id" :is-selected="selectedIssue?.id == issue.id"
-                    :issue="issue" @click="viewIssue" />
-            </v-row>
-        </div>
-        <div v-else class="no-results">
-            <div :class="{ clickable: isManagement }" @click="testLink">
-                <h3>{{ noResultsMessage }}</h3>
-                <h5>{{ noResultsHint }}</h5>
+        <template v-if="isError">
+            <div class="no-results bg-error">
+                <div>
+                    <h3>{{ errorMessage }}</h3>
+                    <h5>{{ errorHint }}</h5>
+                </div>
             </div>
-        </div>
+        </template>
+        <template v-else>
+            <v-skeleton-loader v-if="loading" width="100%" height="80vh" />
+            <div v-else-if="issues?.length" class="scrollable-content">
+                <v-row>
+                    <IssueCard v-for="issue in issues" :key="issue.id" :is-selected="selectedIssue?.id == issue.id"
+                        :issue="issue" @click="viewIssue" />
+                </v-row>
+            </div>
+            <div v-else class="no-results">
+                <div :class="{ clickable: isManagement }" @click="testLink">
+                    <h3>{{ noResultsMessage }}</h3>
+                    <h5>{{ noResultsHint }}</h5>
+                </div>
+            </div>
+        </template>
         <v-footer app absolute class="align-center">
             <v-tooltip location="top">
                 <template #activator="{ props }">
@@ -21,23 +30,19 @@ v-for="issue in issues" :key="issue.id" :is-selected="selectedIssue?.id == issue
                 </template>
                 Recarregar conteúdo
             </v-tooltip>
-            <v-text-field
-v-if="isManagement" v-model="query" label="Query" hide-details density="compact"
+            <v-text-field v-if="isManagement" v-model="query" label="Query" hide-details density="compact"
                 variant="outlined" @update:model-value="updateQuery()" />
             <v-checkbox v-model="filterVoted" hide-details label="Apenas tasks sem voto?" />
             <v-spacer />
-            <v-select
-v-model="paginationSize" max-width="150px" label="Itens por página" :items="paginationSizes"
+            <v-select v-model="paginationSize" max-width="150px" label="Itens por página" :items="paginationSizes"
                 hide-details density="compact" variant="outlined" />
             <div class="controls">
                 <div class="navigation-buttons">
-                    <v-btn
-variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
+                    <v-btn variant="outlined" :loading="loading && prevArrow" :disabled="!prevArrow"
                         icon="mdi-arrow-left" @click="loadPrevPage" />
                 </div>
                 <div class="navigation-buttons">
-                    <v-btn
-variant="outlined" :loading="loading && nextArrow" :disabled="!nextArrow"
+                    <v-btn variant="outlined" :loading="loading && nextArrow" :disabled="!nextArrow"
                         icon="mdi-arrow-right" @click="loadNextPage" />
                 </div>
             </div>
@@ -66,7 +71,6 @@ const user = computed(() => {
     return appStore.getCurrentUserInfo
 })
 const issues = computed(() => {
-
     return filterVoted.value ? filteredIssues.value : issuesStore.getCurrentIssues
 })
 
@@ -77,6 +81,10 @@ const filteredIssues = computed(() => {
         })
     })
 })
+
+const errorMessage = ref("")
+const errorHint = ref("")
+const isError = ref(false)
 
 function loadNextPage() {
     loadIssues({
@@ -100,9 +108,15 @@ function testLink() {
 onMounted(() => {
     loadIssues()
 })
-async function confirmVote(issue) {
-    await issuesStore.setIssueVote(issue)
-    selectedIssue.value = null
+function confirmVote(issue) {
+    issuesStore.setIssueVote(issue)
+        .catch(err => {
+            window.alert(`Erro na requisição: ${err}`)
+        })
+        .finally(() => {
+            loadIssues()
+            selectedIssue.value = null
+        })
 }
 const showIssueModal = ref(false)
 const selectedIssue = ref()
@@ -150,6 +164,9 @@ watch(paginationSize, () => {
 })
 
 function loadIssues(direction = "") {
+    isError.value = false
+    errorHint.value = ""
+    errorMessage.value = ""
     loading.value = true
     let promises = []
     if (!user.value.login) {
@@ -174,13 +191,21 @@ function loadIssues(direction = "") {
                             issuesStore.fetchIssues(filters, direction)
                         ]
                         Promise.all(fetchPromises)
+                            .catch(error => {
+                                errorMessage.value = error
+                                errorHint.value = "Um erro ocorreu durante o carregamento das issues."
+                                isError.value = true
+                            })
                             .finally(() => {
                                 loading.value = false
                             })
                     }
                 })
-        }).catch(() => {
+        }).catch((error) => {
             loading.value = false
+            errorMessage.value = error
+            errorHint.value = "Um erro ocorreu durante o carregamento das issues."
+            isError.value = true
         })
 }
 </script>
@@ -210,7 +235,7 @@ function loadIssues(direction = "") {
 
 .scrollable-content {
     overflow-y: scroll;
-    max-height: calc(100vh - 116px);
+    height: calc(100vh - 120px);
     padding: 16px 64px;
 }
 

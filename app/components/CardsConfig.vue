@@ -1,9 +1,10 @@
 <template>
-    <v-card>
+    <v-card :loading="loading">
         <v-card-text>
-            <v-form>
-                <v-skeleton-loader v-if="loading" type="article" />
-                <CardFields v-for="(card, i) in cards" :key="card.value" v-model="cards[i]" />
+            <div v-if="loadError" class="bg-error pa-3 mb-5">Erro carregando os dados: {{ loadError }}</div>
+            <v-form :disabled="loading">
+                <CardFields v-for="(card, i) in cards" :key="card.value" v-model="cards[i]" @end:updating="loadData()"
+                    @end:deleting="loadData()" />
                 <v-row align="center">
                     <v-col cols="12">
                         <v-btn :disabled="loading" :loading="loading" block size="x-large" @click="showAddCardModal">
@@ -20,32 +21,6 @@
 // import CardFields from "./CardFields.vue"
 import { useAppStore } from '#imports';
 const appStore = useAppStore()
-const addCardModal = ref(false)
-
-const emits = defineEmits(["loading", "success", "error", "loaded"])
-
-const loading = ref(false)
-
-
-function showAddCardModal() {
-    addCardModal.value = true
-}
-
-onMounted(() => {
-    emits("loading")
-    loading.value = true
-    appStore.fetchCardDeck()
-        .then(r => {
-            emits("success", r)
-        })
-        .catch(err => {
-            emits("error", err)
-        })
-        .finally(() => {
-            loading.value = false
-            emits("loaded")
-        })
-})
 
 const cards = computed(() => {
     const sortedCards = appStore.getCardDeck
@@ -53,4 +28,40 @@ const cards = computed(() => {
         return a.value - b.value
     })
 })
+
+const emits = defineEmits(["loading", "success", "error", "loaded"])
+
+const addCardModal = ref(false)
+
+const loading = ref(false)
+const loadError = ref()
+
+
+function showAddCardModal() {
+    addCardModal.value = true
+}
+
+function loadData() {
+    emits("loading")
+    loadError.value = null
+    loading.value = true
+    appStore.fetchCardDeck()
+        .then(r => {
+            emits("success", r)
+        })
+        .catch(err => {
+            loadError.value = err
+            emits("error", err)
+        })
+        .finally(() => {
+            loading.value = false
+            emits("loaded")
+        })
+
+}
+
+onMounted(() => {
+    loadData()
+})
+
 </script>

@@ -5,27 +5,24 @@
         <v-card variant="outlined" :color="isCommentFromCurrentUser ? 'primary' : 'grey'" class="commentary">
             <div class="git-title" :class="isCommentFromCurrentUser ? 'current-user-bg' : 'other-user-bg'">
                 <span class="text-white">
-                    <b>{{ username }}</b> <a :href="historyLink" target="_blank"><span class="text-grey">{{ time
+                    <b>{{ username }}</b> <a :href="historyLink" class="datelink" target="_blank"><span
+                            class="text-grey">{{ time
                             }}</span></a>
                 </span>
                 <v-spacer />
-                <v-icon
-v-if="isCommentFromCurrentUser" color="error" class="mr-4" icon="mdi-delete"
+                <v-icon v-if="isCommentFromCurrentUser" color="error" class="mr-4" icon="mdi-delete"
                     @click="deleteComment" />
                 <v-icon v-if="isCommentFromCurrentUser" color="white" icon="mdi-pencil" @click="editComment" />
             </div>
             <v-card-text class="text-white">
                 <div v-if="isEditing && isCommentFromCurrentUser">
-                    <v-textarea
-v-model="editableComment" :loading="loading" :disabled="loading"
+                    <v-textarea v-model="editableComment" :loading="loading" :disabled="loading"
                         label="Editar comentário" variant="outlined" />
                     <div class="d-flex">
                         <v-spacer />
-                        <v-btn
-:disabled="loading" color="grey" variant="tonal" class="mr-2"
+                        <v-btn :disabled="loading" color="grey" variant="tonal" class="mr-2"
                             @click="cancelUpdate">Cancelar</v-btn>
-                        <v-btn
-:disabled="loading" color="success" variant="tonal"
+                        <v-btn :disabled="loading" color="success" variant="tonal"
                             @click="updateContent">Atualizar</v-btn>
                     </div>
                 </div>
@@ -35,6 +32,9 @@ v-model="editableComment" :loading="loading" :disabled="loading"
         <v-dialog v-model="showDeleteConfirm" width="400px" persistent>
             <v-card :loading="loading">
                 <v-toolbar density="compact" title="Confirmar remoção" />
+                <div class="bg-error" v-if="hasError">
+                    Houve um erro:{{ errorMessage }}
+                </div>
                 <v-card-text>
                     Deseja remover o comentário?
                 </v-card-text>
@@ -99,7 +99,7 @@ const userAvatar = computed(() => {
 
 //META
 const time = computed(() => {
-    return props.commentary.updated_at
+    return new Date(props.commentary.updated_at).toLocaleString()
 })
 
 //CONTEUDO
@@ -116,11 +116,16 @@ const isEditing = ref(false)
 const loading = ref(false)
 const showDeleteConfirm = ref(false)
 
+const errorMessage = ref("")
+const hasError = ref(false)
+
 function confirmDelete() {
     emits("start:deleting", {
         repo: props.issue?.content?.repository?.name,
         comment_id: props.commentary.id
     })
+    errorMessage.value = ''
+    hasError.value = false
     loading.value = true
     commentaryStore.deleteComment({
         repo: props.issue?.content?.repository?.name,
@@ -131,6 +136,8 @@ function confirmDelete() {
         })
         .catch(err => {
             emits("error:deleting", err)
+            errorMessage.value = err
+            hasError.value = true
         })
         .finally(() => {
             loading.value = false
@@ -156,6 +163,8 @@ function cancelUpdate() {
 function updateContent() {
     //salvar conteúdo do editableComment no git
     emits("start:saving", editableComment.value)
+    errorMessage.value = ''
+    hasError.value = false
     loading.value = true
     commentaryStore.updateComment({
         repo: props.issue?.content?.repository?.name,
@@ -167,6 +176,8 @@ function updateContent() {
             isEditing.value = false
         })
         .catch(err => {
+            errorMessage.value = err
+            hasError.value = false
             emits("error:saving", err)
         })
         .finally(() => {
@@ -203,6 +214,13 @@ function updateContent() {
         width: calc(100% - 58px);
         margin-left: 16px;
     }
+}
+
+.datelink {
+    text-decoration: none;
+    font-weight: 600;
+    opacity: 0.5;
+    margin-left: 16px;
 }
 </style>
 <style lang="scss">

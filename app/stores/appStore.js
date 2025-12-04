@@ -266,12 +266,12 @@ export const useAppStore = defineStore("appStore", {
             username: this.getCurrentUserInfo.login,
           },
           body: {
-            number: v,
+            id: v,
           },
         });
         return deletedProject;
       } catch (error) {
-        console.error("Erro ao excluir carta:", error);
+        console.error("Erro ao excluir projeto:", error);
         throw error;
       }
     },
