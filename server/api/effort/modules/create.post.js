@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
         value: body.value,
         text: body.text,
         tooltip: body.tooltip,
+        repository: body.repository,
         points: body.points,
       });
       const response = await newEffort.save(); // Salvar a nova issue no banco
@@ -25,6 +26,7 @@ export default defineEventHandler(async (event) => {
         {
           text: body.text,
           tooltip: body.tooltip,
+          repository: body.repository,
           points: body.points,
         }
       );

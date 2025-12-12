@@ -14,19 +14,20 @@
                 <v-form v-model="isValid">
                     <v-row align="center">
                         <v-col cols="12" md="6">
-                            <v-text-field
-v-model.trim="computedValue" validate-on="eager" :rules="variableNameRules"
+                            <v-text-field v-model.trim="computedValue" validate-on="eager" :rules="variableNameRules"
                                 label="Valor do campo" hint="Valor que vai ser usado na geração da table" />
                         </v-col>
                         <v-col cols="12" md="6">
-                            <v-text-field
-v-model="newModule.text" validate-on="eager" :rules="required"
+                            <v-text-field v-model="newModule.text" validate-on="eager" :rules="required"
                                 label="Texto da coluna" hint="Texto usado na coluna" />
                         </v-col>
-                        <v-col cols="12" md="12">
-                            <v-text-field
-v-model="newModule.tooltip" label="Formação da tooltip do módulo"
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="newModule.tooltip" label="Formação da tooltip do módulo"
                                 hint="Ainda não está sendo utilizado" />
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="newModule.repository" label="Repositório"
+                                hint="Associar este módulo a um repositório (deixar em branco para tornar universal)" />
                         </v-col>
                         <v-col cols="12">
                             <v-card variant="outlined" title="Valores:">
@@ -36,14 +37,12 @@ v-model="newModule.tooltip" label="Formação da tooltip do módulo"
                                     </v-row>
                                     <v-row v-for="(point, index) in newModule.points" :key="index" dense>
                                         <v-col>
-                                            <v-number-input
-v-model="point.value" validate-on="eager"
+                                            <v-number-input v-model="point.value" validate-on="eager"
                                                 :rules="pointsRules" :precision="0" :min="0" label="Valor do ponto"
                                                 prepend-icon="mdi-delete" @click:prepend="deleteValue(index)" />
                                         </v-col>
                                         <v-col>
-                                            <v-text-field
-v-model="point.text" validate-on="eager" :rules="required"
+                                            <v-text-field v-model="point.text" validate-on="eager" :rules="required"
                                                 label="Valor exibido no select" />
                                         </v-col>
                                     </v-row>

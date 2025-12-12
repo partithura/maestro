@@ -1,6 +1,10 @@
 <template>
     <v-card>
         <v-card-text>
+            <v-row justify="start">
+                <v-col cols="12" sm="6" md="6" lg="5" xxl="4"><v-text-field v-model="filter" label="Filtro"
+                        clearable /></v-col>
+            </v-row>
             <AreaFields v-for="(area, i) in areas" :key="area.id" v-model="areas[i]" @end:deleting="reload()" />
             <v-row>
                 <v-col cols="12">
@@ -18,6 +22,7 @@ import { useEffortStore } from "#imports"
 const effortStore = useEffortStore()
 const loading = ref(false)
 const addNewAreaModal = ref(false)
+const filter = ref()
 
 const emits = defineEmits([
     "start:loading",
@@ -27,12 +32,19 @@ const emits = defineEmits([
 ])
 const areas = computed({
     get() {
-        return effortStore.getEffortAreas
+        return effortStore.getEffortAreas.filter(searchFilter)
     },
     set(v) {
         effortStore.setAreas(v)
     }
 })
+
+function searchFilter(v) {
+    if (filter.value) {
+        return v.text.includes(filter.value?.toLowerCase()) || v.value.includes(filter.value?.toLowerCase()) || v.repository.includes(filter.value?.toLowerCase())
+    }
+    return true
+}
 
 function reload() {
     emits("start:loading")

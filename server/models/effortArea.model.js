@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const effortArea = new mongoose.Schema({
   text: { type: String, required: true },
-  value: { type: String, required: true, unique:true },
+  value: { type: String, required: true, unique: true },
+  repository: { type: String },
 });
 
 const EffortArea = mongoose.model("EffortArea", effortArea);
 
 export default EffortArea;
-

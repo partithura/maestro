@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
       const newEffort = new EffortArea({
         value: body.value,
         text: body.text,
+        repository: body.repository,
       });
       const response = await newEffort.save(); // Salvar a nova issue no banco
       return response;
@@ -22,6 +23,7 @@ export default defineEventHandler(async (event) => {
         },
         {
           text: body.text,
+          repository: body.repository,
         }
       );
       return response;

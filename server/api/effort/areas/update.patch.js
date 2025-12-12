@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
         },
         {
           text: body.text,
+          repository: body.repository,
         }
       );
       return newEffortArea;

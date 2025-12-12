@@ -1,4 +1,6 @@
 const changelog = [
+  "Adicionado opção de associar um módulo ou área à um repositório;",
+  "-----------",
   "Mudança visual no esquema de cores da Dashboard;",
   "Incluido repositório e número da task nos cards da Dashboard;",
   "Adicionado tooltip com o valor votado na task, nos cards da Dashboard;",

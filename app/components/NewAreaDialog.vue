@@ -12,14 +12,16 @@
             <v-card-text>
                 <v-form v-model="isValid">
                     <v-col>
-                        <v-text-field
-v-model="area.text" validate-on="eager" :rules="[isRequired]" :loading="loading" :disabled="loading"
-                            label="Título"/>
+                        <v-text-field v-model="area.text" validate-on="eager" :rules="[isRequired]" :loading="loading"
+                            :disabled="loading" label="Título" />
                     </v-col>
                     <v-col>
-                        <v-text-field
-v-model="area.value" validate-on="eager" :loading="loading" :rules="[isRequired,isValidVariableName]" :disabled="loading"
-                            label="Valor"/>
+                        <v-text-field v-model="area.value" validate-on="eager" :loading="loading"
+                            :rules="[isRequired, isValidVariableName]" :disabled="loading" label="Valor" />
+                    </v-col>
+                    <v-col>
+                        <v-text-field v-model="area.repository" validate-on="eager" :loading="loading"
+                            :disabled="loading" label="Repositório" />
                     </v-col>
                 </v-form>
             </v-card-text>
@@ -38,7 +40,8 @@ const isValid = ref(false)
 const loading = ref(false)
 const area = ref({
     text: "",
-    value: ""
+    value: "",
+    repository: "",
 })
 
 const emits = defineEmits([

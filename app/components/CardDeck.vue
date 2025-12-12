@@ -93,6 +93,10 @@ const props = defineProps({
   votes: {
     type: Array,
     default: () => []
+  },
+  issue: {
+    type: Object,
+    default: () => { }
   }
 })
 const voteLoading = ref(false)
@@ -104,10 +108,15 @@ const isManagement = computed(() => {
 })
 
 const headers = computed(() => {
-  return effortStore.getEffortModules
+  return effortStore.getEffortModules.filter(mod => {
+    return (mod.repository == props.issue?.content?.repository?.name) || (!mod.repository)
+  })
 })
+
 const items = computed(() => {
-  return effortStore.getEffortAreas
+  return effortStore.getEffortAreas.filter(area => {
+    return (area.repository == props.issue?.content?.repository?.name) || (!area.repository)
+  })
 })
 
 const emits = defineEmits([

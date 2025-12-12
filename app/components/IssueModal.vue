@@ -41,7 +41,7 @@
                     </v-card-text>
                 </v-card>
                 <CardDeck ref="cardDeck" v-model="selectedCard" :votes="databaseIssue?.votes" :is-ready="isReady"
-                    :cant-vote="cantVote" :loading="loading" :show-votes="showVotes" />
+                    :cant-vote="cantVote" :loading="loading" :show-votes="showVotes" :issue="props.issue" />
 
                 <GitChat :issue="issue" />
             </v-card-text>

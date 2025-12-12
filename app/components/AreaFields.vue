@@ -1,14 +1,18 @@
 <template>
     <v-form v-model="isValid">
         <v-row>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="4">
                 <v-text-field validate-on="eager" v-model="area.text" :loading="loading" :rules="[isRequired]"
                     :disabled="loading" prepend-icon="mdi-delete" label="Título" @update:model-value="updateModule()"
                     @click:prepend="showDeleteConfirm" />
             </v-col>
-            <v-col cols="12" sm="6">
+            <v-col cols="12" sm="4">
                 <v-text-field validate-on="eager" v-model="area.value" :loading="loading" readonly :disabled="loading"
                     label="Valor" @update:model-value="updateModule()" />
+            </v-col>
+            <v-col cols="12" sm="4">
+                <v-text-field validate-on="eager" v-model="area.repository" :loading="loading" :disabled="loading"
+                    label="Repositório" @update:model-value="updateModule()" />
             </v-col>
             <v-col v-if="hasErrorUpdating" cols="12" class="bg-error">
                 Ocorreu um erro: {{ errorUpdating }}

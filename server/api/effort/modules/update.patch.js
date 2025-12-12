@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
         {
           text: body.text,
           tooltip: body.tooltip,
+          repository: body.repository,
           points: body.points,
         }
       );

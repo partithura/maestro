@@ -17,9 +17,14 @@
                             label="Texto da coluna" hint="Texto usado na coluna"
                             @update:model-value="updateModule(module)" />
                     </v-col>
-                    <v-col cols="12" md="12">
+                    <v-col cols="12" md="6">
                         <v-text-field v-model="module.tooltip" :loading="loading" label="Formação da tooltip do módulo"
                             hint="Ainda não está sendo utilizado" @update:model-value="updateModule(module)" />
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-text-field v-model="module.repository" :loading="loading" label="Repositório"
+                            hint="Associar este módulo à um repositório (deixar em branco para tornar universal)"
+                            @update:model-value="updateModule(module)" />
                     </v-col>
                     <v-col cols="12">
                         <v-card variant="outlined" title="Valores:">
