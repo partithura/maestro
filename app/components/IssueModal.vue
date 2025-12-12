@@ -14,7 +14,7 @@
                     </v-tooltip>
                 </template>
                 <template #append>
-                    <div>
+                    <div class="mr-4">
                         <div class="issue-link">
                             <a :href="issueURL" target="_blank" :class="issueLinkColor" class="mr-4">{{
                                 issue.content.repository.name }}/#{{
