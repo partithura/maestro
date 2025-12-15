@@ -46,9 +46,13 @@ export const useIssuesStore = defineStore("issuesStore", {
       issues: [],
       mongoIssues: [],
       links: {},
+      currentIssue: {},
     };
   },
   getters: {
+    getCurrentIssue: (state) => {
+      return state.currentIssue;
+    },
     getCurrentIssues: (state) => {
       return state.issues.map((issue) => {
         const mongoData = state.mongoIssues.find((m) => {
@@ -128,6 +132,34 @@ export const useIssuesStore = defineStore("issuesStore", {
         });
         this.setCurrentIssues(response.issues);
         this.setCurrentMongoIssues(response.mongo);
+        if (response.headers.link) {
+          this.setCurrentLinks(parseLinkHeaderManually(response.headers.link));
+        }
+        return response;
+      } catch (error) {
+        console.error("Erro ao buscar issues:", error);
+        throw error;
+      }
+    },
+    async fetchIssue(filters) {
+      const user = useAppStore().getCurrentUserInfo.login;
+      const githubToken = useCookie("token");
+      if (!githubToken.value) {
+        throw new Error("Nenhum token disponível.");
+      }
+
+      try {
+        const response = await $fetch("/api/gitIssues/issue", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${githubToken.value}`,
+            "Content-Type": "application/json",
+            username: user,
+          },
+          params: { ...filters },
+        });
+        this.currentIssue = response.issue;
+        console.log("Response:", response);
         if (response.headers.link) {
           this.setCurrentLinks(parseLinkHeaderManually(response.headers.link));
         }

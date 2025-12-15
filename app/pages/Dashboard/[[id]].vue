@@ -56,7 +56,10 @@
 
 <script setup>
 import { useAppStore, useIssuesStore } from '#imports'
-import { useRoute } from 'vue-router'; // or just use the global useRoute() helper
+import { useRoute } from 'vue-router';
+const config = useRuntimeConfig();
+
+const { organizationName } = config.public;
 
 const route = useRoute();
 const appStore = useAppStore();
@@ -228,9 +231,25 @@ function checkIssueRoute(val) {
         navigateTo('/dashboard')
         return
     }
-    const foundIssue = issuesStore.getCurrentIssues?.find(issue => {
-        return issue.id == val
+    //TODO: carregar issue via API, não via store...
+    console.log("Filtro:", {
+        project_number: appStore.getActiveProject?.number,
+        item_id: issueId.value,
+        org: organizationName
     })
+    issuesStore.fetchIssue({
+        project_number: appStore.getActiveProject?.number,
+        item_id: issueId.value,
+        org: organizationName
+    }).then(r => {
+        console.log("R:", r)
+    }).catch(err => {
+        console.error(err)
+    })
+    const foundIssue = issuesStore.getCurrentIssue
+    // issuesStore.getCurrentIssues?.find(issue => {
+    //     return issue.id == val
+    // })
     if (foundIssue?.id) {
         viewIssue(foundIssue)
     }
@@ -254,9 +273,9 @@ function loadIssues(direction = "") {
                     query.value = appStore.getActiveProject.query
                     if (appStore.getActiveProject.number) {
                         const filters = {
-                            org: "partithura",
+                            org: organizationName,
                             projectNumber: appStore.getActiveProject.number,
-                            paginationSize: paginationSize.value.value,//ver isso
+                            paginationSize: paginationSize.value.value,
                             q: query.value
                         }
                         fetchPromises = [
@@ -271,6 +290,7 @@ function loadIssues(direction = "") {
                             })
                             .finally(() => {
                                 loading.value = false
+                                checkIssueRoute(issueId.value)
                             })
                     }
                 })
