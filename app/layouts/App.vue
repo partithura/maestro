@@ -7,7 +7,10 @@
                 <template #activator="{ props }">
                     <v-icon :color="iconColor" v-bind="props">mdi-network-strength-{{ iconType }}</v-icon>
                 </template>
-                Uso da API: {{ usageCredits }}/{{ totalCredits }}
+                <h3>Uso de créditos da API do GitHub:</h3>
+                <div>Total: {{ totalCredits }}</div>
+                <div>Utilizado: {{ usedCredits }}</div>
+                <div>Disponível: {{ usageCredits }}</div>
             </v-tooltip>
         </div>
     </div>
@@ -21,6 +24,9 @@ const usageCredits = computed(() => {
 })
 const totalCredits = computed(() => {
     return appStore.getTotalCredits
+})
+const usedCredits = computed(() => {
+    return appStore.getUsedCredits
 })
 const iconType = computed(() => {
     return Math.ceil(usageCredits.value / (totalCredits.value / 4))

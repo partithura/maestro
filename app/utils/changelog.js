@@ -1,4 +1,8 @@
 const changelog = [
+  "Adicionado medidor de créditos da API do GitHub;",
+  "Adicionado link direto para issues no Maestro;",
+  "Melhoria na atribuição de repositórios aos módulos e áreas;",
+  "-----------",
   "Adicionado opção de associar um módulo ou área à um repositório;",
   "-----------",
   "Mudança visual no esquema de cores da Dashboard;",

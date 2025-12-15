@@ -137,6 +137,7 @@ export const useIssuesStore = defineStore("issuesStore", {
           this.setCurrentLinks(parseLinkHeaderManually(response.headers.link));
         }
         appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setUsedCredits(response.headers["x-ratelimit-used"]);
         appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
@@ -164,6 +165,7 @@ export const useIssuesStore = defineStore("issuesStore", {
         });
         this.currentIssue = response.issue;
         appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setUsedCredits(response.headers["x-ratelimit-used"]);
         appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         if (response.headers.link) {
           this.setCurrentLinks(parseLinkHeaderManually(response.headers.link));
@@ -221,6 +223,7 @@ export const useIssuesStore = defineStore("issuesStore", {
           body: issue,
         });
         appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setUsedCredits(response.headers["x-ratelimit-used"]);
         appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
@@ -248,6 +251,7 @@ export const useIssuesStore = defineStore("issuesStore", {
           },
         });
         appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setUsedCredits(response.headers["x-ratelimit-used"]);
         appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
@@ -277,6 +281,7 @@ export const useIssuesStore = defineStore("issuesStore", {
           },
         });
         appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setUsedCredits(response.headers["x-ratelimit-used"]);
         appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
