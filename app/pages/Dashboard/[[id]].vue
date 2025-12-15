@@ -13,7 +13,7 @@
             <div v-else-if="issues?.length" class="scrollable-content">
                 <v-row>
                     <IssueCard v-for="issue in issues" :key="issue.id" :is-selected="selectedIssue?.id == issue.id"
-                        :issue="issue" @click="viewIssue" />
+                        :issue="issue" @click="handleCardClick" />
                 </v-row>
             </div>
             <div v-else class="no-results">
@@ -50,15 +50,21 @@
             </div>
         </v-footer>
         <IssueModal v-model="showIssueModal" :issue="selectedIssue" @confirm-vote="confirmVote"
-            @end:voting="loadIssues()" />
+            @close="navigateTo('/dashboard')" />
     </div>
 </template>
 
 <script setup>
 import { useAppStore, useIssuesStore } from '#imports'
+import { useRoute } from 'vue-router'; // or just use the global useRoute() helper
+
+const route = useRoute();
 const appStore = useAppStore();
 const issuesStore = useIssuesStore()
 const loading = ref(true)
+const issueId = computed(() => {
+    return route.params.id
+})
 const filterVoted = computed({
     get() {
         return prefs.value?.only_filtered_items
@@ -140,6 +146,10 @@ function testLink() {
     }
 }
 
+function handleCardClick(issue) {
+    navigateTo(`/dashboard/${issue.id}`)
+}
+
 onMounted(() => {
     loadIssues()
 })
@@ -149,8 +159,7 @@ function confirmVote(issue) {
             window.alert(`Erro na requisição: ${err}`)
         })
         .finally(() => {
-            loadIssues()
-            selectedIssue.value = null
+            navigateTo('/dashboard')
         })
 }
 const showIssueModal = ref(false)
@@ -209,6 +218,24 @@ watch(paginationSize, () => {
     loadIssues()
 })
 
+watch(issueId, (val) => {
+    //achar a issue
+    checkIssueRoute(val)
+})
+
+function checkIssueRoute(val) {
+    if (!val) {
+        navigateTo('/dashboard')
+        return
+    }
+    const foundIssue = issuesStore.getCurrentIssues?.find(issue => {
+        return issue.id == val
+    })
+    if (foundIssue?.id) {
+        viewIssue(foundIssue)
+    }
+}
+
 function loadIssues(direction = "") {
     isError.value = false
     errorHint.value = ""
@@ -252,6 +279,9 @@ function loadIssues(direction = "") {
             errorMessage.value = error
             errorHint.value = "Um erro ocorreu durante o carregamento das issues."
             isError.value = true
+        })
+        .finally(() => {
+            checkIssueRoute(issueId.value)
         })
 }
 </script>

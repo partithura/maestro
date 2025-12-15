@@ -98,6 +98,7 @@ const emits = defineEmits([
     "success:voting",
     "error:voting",
     "end:voting",
+    "close"
 ])
 const issueLinkColor = computed(() => {
     const name = props.issue?.content?.repository?.name
@@ -135,6 +136,7 @@ const isManagement = computed(() => {
 function closeModal() {
     selectedCard.value = null
     model.value = false
+    emits("close")
 }
 
 const isReady = computed(() => {
@@ -208,7 +210,6 @@ watch(model, async (n, o) => {
             if (i >= 0) {
                 selectedCard.value = databaseIssue.value.votes[i].vote
             }
-
         }
         loading.value = false
     }

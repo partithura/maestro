@@ -2,25 +2,25 @@ import { Octokit } from "octokit";
 const config = useRuntimeConfig();
 const ORGANIZATION_NAME = config.organizationName;
 
-const publicRoutes = [
-  "/api/effort/areas/list",
-  "/api/effort/modules/list",
-  "/api/user/github",
-  "/configuration",
-  "/dashboard",
-  "/kanban",
-  "/login",
-  "/",
-  "",
-];
+// const publicRoutes = [
+//   "/api/effort/areas/list",
+//   "/api/effort/modules/list",
+//   "/api/user/github",
+//   "/configuration",
+//   "/dashboard",
+//   "/kanban",
+//   "/login",
+//   "/",
+//   "",
+// ];
 
 export default defineEventHandler(async (event) => {
   const token = getHeader(event, "authorization")?.replace("Bearer ", "");
   const username = getHeader(event, "username");
-  const url = event.node.req.url;
-  if (publicRoutes.some((route) => url === route)) {
-    return;
-  }
+  // const url = event.node.req.url;
+  // if (publicRoutes.some((route) => url === route)) {
+  //   return;
+  // }
 
   if (!token) {
     throw createError({
