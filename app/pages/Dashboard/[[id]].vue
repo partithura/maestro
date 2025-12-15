@@ -231,18 +231,10 @@ function checkIssueRoute(val) {
         navigateTo('/dashboard')
         return
     }
-    //TODO: carregar issue via API, não via store...
-    console.log("Filtro:", {
-        project_number: appStore.getActiveProject?.number,
-        item_id: issueId.value,
-        org: organizationName
-    })
     issuesStore.fetchIssue({
         project_number: appStore.getActiveProject?.number,
         item_id: issueId.value,
         org: organizationName
-    }).then(r => {
-        console.log("R:", r)
     }).catch(err => {
         console.error(err)
     })

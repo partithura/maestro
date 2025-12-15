@@ -110,7 +110,6 @@ const isManagement = computed(() => {
 const headers = computed(() => {
   return effortStore.getEffortModules.filter(mod => {
     const repositories = mod.repository?.split(',')
-    console.log("Repositories:", repositories)
     return repositories?.some(r => {
       return props.issue?.content?.repository?.name?.includes(r?.trim())
     }) || (!mod.repository)

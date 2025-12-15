@@ -204,7 +204,7 @@ watch(model, async (n, o) => {
         loading.value = true
         databaseIssue.value = await issuesStore.fetchCurrentIssue(props.issue.id)
         if (databaseIssue.value) {
-            const i = databaseIssue.value.votes.findIndex(vote => {
+            const i = databaseIssue.value?.votes?.findIndex(vote => {
                 return vote.user.id == user.value.id
             })
             if (i >= 0) {

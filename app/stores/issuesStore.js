@@ -108,7 +108,8 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
     },
     async fetchIssues(filters, pagination = null) {
-      const user = useAppStore().getCurrentUserInfo.login;
+      const appStore = useAppStore();
+      const user = appStore.getCurrentUserInfo.login;
       let resolvedDirection;
       if (pagination?.direction) {
         pagination.direction == "next"
@@ -132,6 +133,38 @@ export const useIssuesStore = defineStore("issuesStore", {
         });
         this.setCurrentIssues(response.issues);
         this.setCurrentMongoIssues(response.mongo);
+        if (response.headers.link) {
+          this.setCurrentLinks(parseLinkHeaderManually(response.headers.link));
+        }
+        appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
+        return response;
+      } catch (error) {
+        console.error("Erro ao buscar issues:", error);
+        throw error;
+      }
+    },
+    async fetchIssue(filters) {
+      const appStore = useAppStore();
+      const user = appStore.getCurrentUserInfo.login;
+      const githubToken = useCookie("token");
+      if (!githubToken.value) {
+        throw new Error("Nenhum token disponível.");
+      }
+
+      try {
+        const response = await $fetch("/api/gitIssues/issue", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${githubToken.value}`,
+            "Content-Type": "application/json",
+            username: user,
+          },
+          params: { ...filters },
+        });
+        this.currentIssue = response.issue;
+        appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         if (response.headers.link) {
           this.setCurrentLinks(parseLinkHeaderManually(response.headers.link));
         }
@@ -170,7 +203,8 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
     },
     async setIssueVote(issue) {
-      const user = useAppStore().getCurrentUserInfo.login;
+      const appStore = useAppStore();
+      const user = appStore.getCurrentUserInfo.login;
       const githubToken = useCookie("token");
       if (!githubToken.value) {
         throw new Error("Nenhum token disponível.");
@@ -186,6 +220,8 @@ export const useIssuesStore = defineStore("issuesStore", {
           },
           body: issue,
         });
+        appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
         console.error("Erro ao salvar issues no mongodb:", error);
@@ -193,7 +229,8 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
     },
     async fetchCurrentIssue(issueId) {
-      const user = useAppStore().getCurrentUserInfo.login;
+      const appStore = useAppStore();
+      const user = appStore.getCurrentUserInfo.login;
       const githubToken = useCookie("token");
       if (!githubToken.value) {
         throw new Error("Nenhum token disponível.");
@@ -210,6 +247,8 @@ export const useIssuesStore = defineStore("issuesStore", {
             issueId: issueId,
           },
         });
+        appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
         return `Erro na requisição: ${error}`;
@@ -237,6 +276,8 @@ export const useIssuesStore = defineStore("issuesStore", {
             dificuldade: value,
           },
         });
+        appStore.setUsageCredits(response.headers["x-ratelimit-remaining"]);
+        appStore.setTotalCredits(response.headers["x-ratelimit-limit"]);
         return response;
       } catch (error) {
         return `Erro na requisição: ${error}`;

@@ -6,9 +6,13 @@ export const useAppStore = defineStore("appStore", {
     token: "",
     cards: [],
     projects: [],
+    usageCredits: 0,
+    totalCredits: 0,
   }),
   getters: {
     getCurrentUserInfo: (state) => state.userInfo,
+    getUsageCredits: (state) => state.usageCredits,
+    getTotalCredits: (state) => state.totalCredits,
     getCurrentToken: (state) => state.token,
     getCardDeck: (state) => state.cards,
     getProjects: (state) => state.projects,
@@ -22,6 +26,12 @@ export const useAppStore = defineStore("appStore", {
     },
     updateCurrentToken(v) {
       this.token = v;
+    },
+    setUsageCredits(v) {
+      this.usageCredits = v;
+    },
+    setTotalCredits(v) {
+      this.totalCredits = v;
     },
     async updateUser(token) {
       if (!token) {
