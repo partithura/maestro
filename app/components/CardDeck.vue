@@ -109,13 +109,20 @@ const isManagement = computed(() => {
 
 const headers = computed(() => {
   return effortStore.getEffortModules.filter(mod => {
-    return (mod.repository == props.issue?.content?.repository?.name) || (!mod.repository)
+    const repositories = mod.repository?.split(',')
+    console.log("Repositories:", repositories)
+    return repositories?.some(r => {
+      return props.issue?.content?.repository?.name?.includes(r?.trim())
+    }) || (!mod.repository)
   })
 })
 
 const items = computed(() => {
   return effortStore.getEffortAreas.filter(area => {
-    return (area.repository == props.issue?.content?.repository?.name) || (!area.repository)
+    const repositories = area.repository?.split(',')
+    return repositories?.some(r => {
+      return props.issue?.content?.repository?.name.includes(r?.trim())
+    }) || (!area.repository)
   })
 })
 

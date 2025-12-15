@@ -43,7 +43,7 @@ export const useEffortStore = defineStore("effortStore", {
         const listEffortModules = await $fetch("/api/effort/modules/list", {
           method: "GET",
         });
-        console.log("EffortModules:", listEffortModules);
+        // console.log("EffortModules:", listEffortModules);
         this.effortModules = listEffortModules;
         return listEffortModules;
       } catch (error) {

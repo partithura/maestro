@@ -187,10 +187,10 @@ function savePoints() {
     } else {
         issuesStore.showCards(props.issue)
             .then(r => {
-                console.log("Response:", r)
+                // console.log("Response:", r)
             })
             .catch(e => {
-                console.log("Error:", e)
+                // console.log("Error:", e)
             })
             .finally(() => {
                 loading.value = false
