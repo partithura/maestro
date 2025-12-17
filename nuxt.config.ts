@@ -28,7 +28,16 @@ export default defineNuxtConfig({
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", addHook);
     },
+    "nuxt-gql-pulse",
   ],
+  gqlPulse: {
+    clients: {
+      default: {
+        // You can name the client anything, 'default' is common
+        endpoint: "https://api.github.com/graphql",
+      },
+    },
+  },
   plugins: ["~/plugins/vuetify.js"],
   components: true,
   css: [

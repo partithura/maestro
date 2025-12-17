@@ -122,7 +122,7 @@ export const useIssuesStore = defineStore("issuesStore", {
       }
 
       try {
-        const response = await $fetch("/api/gitIssues/github", {
+        const response = await $fetch("/api/gitIssues/graphql", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${githubToken.value}`,
@@ -131,6 +131,7 @@ export const useIssuesStore = defineStore("issuesStore", {
           },
           body: { ...filters, ...resolvedDirection },
         });
+        console.log("Response from GraphQL: ", response);
         this.setCurrentIssues(response.issues);
         this.setCurrentMongoIssues(response.mongo);
         if (response.headers.link) {
