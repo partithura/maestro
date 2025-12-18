@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import ErrorLog from "../../models/error.model";
 import Issue from "../../models/issue.model";
 import { env } from "~~/server/support/env";
+import { triggerSSEEvent } from "../../utils/sse";
 
 export default defineEventHandler(async (event) => {
   // Obter o token do header Authorization
@@ -51,6 +52,10 @@ export default defineEventHandler(async (event) => {
       }
     );
     const mongoResponse = await Issue.find();
+    await triggerSSEEvent("sse:data-update", {
+      message: new Date().toLocaleString(),
+      details: body,
+    });
 
     if (response.errors) {
       throw new Error(response.errors[0].message);
