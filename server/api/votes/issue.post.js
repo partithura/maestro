@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Issue from "~~/server/models/issue.model";
+import User from "~~/server/models/user.model";
 import { env } from "~~/server/support/env";
 
 export default defineEventHandler(async (event) => {
@@ -26,7 +27,17 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event);
   const { issue, vote, user } = body;
+
+  let url = "https://e354a4fda315.ngrok-free.app/api/v1/clean";
+  let usersToNotify = await User.find({
+    telegramId: { $exists: true, $ne: null },
+  });
+  usersToNotify = usersToNotify.filter((u) => {
+    return u.id != user.id;
+  });
+
   //verificar se a issue já está cadastrada. se não estiver, criar a issue
+
   try {
     const exists = await Issue.exists({ id: issue.id });
     if (!exists) {
@@ -48,6 +59,14 @@ export default defineEventHandler(async (event) => {
         ],
       });
       await newIssue.save(); // Salvar a nova issue no banco
+      usersToNotify.forEach((usr) => {
+        let options = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: `{"service":"TELEGRAM","to":"${usr.telegramId}","message":"Uma nova task foi criada. -${issue.content.title}- acabou de receber um voto."}`,
+        };
+        $fetch(url, options);
+      });
     } else {
       // A issue existe, verificar se o usuário já votou
       const existingIssue = await Issue.findOne({ id: issue.id });

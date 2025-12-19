@@ -11,7 +11,6 @@
                 <div>Total: {{ totalCredits }}</div>
                 <div>Utilizado: {{ usedCredits }}</div>
                 <div>Disponível: {{ usageCredits }}</div>
-                <div>Ping: {{ pingValue }}</div>
             </v-tooltip>
         </div>
     </div>
@@ -38,11 +37,6 @@ const iconColor = computed(() => {
     }
     return 'white'
 })
-const pingValue = ref('')
-const eventSource = new EventSource('http://localhost:3000/sse')
-eventSource.onmessage = (e) => {
-    pingValue.value = e.data
-}
 </script>
 
 <style lang="scss" scoped>

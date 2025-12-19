@@ -49,7 +49,9 @@
                 <v-btn :href="issueURL" target="_blank">Issue número #{{ issue.content.number }}</v-btn>
                 <v-spacer />
                 <v-select v-if="isManagement" v-model="finalValueRef" :items="cards" item-title="value" clearable
-                    item-value="value" label="Sobrescrever voto" density="compact" hide-details max-width="180px" />
+                    item-value="value" label="Sobrescrever voto" density="compact" hide-details max-width="200px" />
+                <v-btn width="234px" v-if="isManagement" :disabled="loading" :loading="loading" color="deep-orange"
+                    variant="tonal" @click="notifyUsers">Notificar usuários</v-btn>
                 <v-btn width="264px" v-if="isManagement" :disabled="loading" :loading="loading" :color="saveButtonColor"
                     variant="tonal" @click="savePoints">{{ saveButtonText }}</v-btn>
                 <v-btn width="264px" :disabled="cantVote || loading" :loading="loading" color="success" variant="tonal"
@@ -60,6 +62,7 @@
 </template>
 <script setup>
 import { useAppStore, useIssuesStore } from '#imports'
+
 const appStore = useAppStore()
 const issuesStore = useIssuesStore()
 const props = defineProps({
@@ -199,20 +202,32 @@ function savePoints() {
     }
 }
 
-watch(model, async (n, o) => {
-    if (n && !o) {
+function notifyUsers() {
+    appStore.sendNotification(`https://maestro.partithura.app/dashboard/${props.issue?.id}`, databaseIssue.value?.votes)
+}
+
+watch(() => props.issue, () => {
+    nextTick(() => {
         loading.value = true
-        databaseIssue.value = await issuesStore.fetchCurrentIssue(props.issue.id)
-        if (databaseIssue.value) {
-            const i = databaseIssue.value?.votes?.findIndex(vote => {
-                return vote.user.id == user.value.id
+        issuesStore.fetchCurrentIssue(props.issue?.id)
+            .then(r => {
+                databaseIssue.value = r
+                if (databaseIssue.value) {
+                    const i = databaseIssue.value?.votes?.findIndex(vote => {
+                        return vote.user.id == user.value.id
+                    })
+                    if (i >= 0) {
+                        selectedCard.value = databaseIssue.value.votes[i].vote
+                    }
+                }
             })
-            if (i >= 0) {
-                selectedCard.value = databaseIssue.value.votes[i].vote
-            }
-        }
-        loading.value = false
-    }
+            .catch(e => {
+                console.log("Error:", e)
+            })
+            .finally(() => {
+                loading.value = false
+            })
+    })
 })
 </script>
 <style lang="scss">

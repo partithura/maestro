@@ -34,12 +34,16 @@
                     <v-list-item v-if="isManagement" @click="goToAdminPage">
                         <v-list-item-title>Configurações</v-list-item-title>
                     </v-list-item>
+                    <v-list-item @click="registerTelegram">
+                        <v-list-item-title>Ativar notificações</v-list-item-title>
+                    </v-list-item>
                     <v-list-item @click="logout">
                         <v-list-item-title>Logout</v-list-item-title>
                     </v-list-item>
                 </v-list>
             </v-menu>
         </template>
+        <TelegramNotification v-model="showTelegramModal" />
     </v-app-bar>
 </template>
 <script setup>
@@ -60,6 +64,8 @@ const userMenu = ref([
     }
 ])
 
+const showTelegramModal = ref(false)
+
 
 const isManagement = computed(() => {
     return appStore.getCurrentUserInfo.isManagement
@@ -79,6 +85,9 @@ function goToAdminPage() {
 }
 function goToRoute(r) {
     navigateTo(r)
+}
+function registerTelegram() {
+    showTelegramModal.value = true
 }
 
 </script>

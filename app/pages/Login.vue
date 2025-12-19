@@ -5,13 +5,16 @@
                 {{ name }} v{{ version }}
             </span>
         </div>
-        <v-card-text>
-            <v-text-field v-model="token" :loading="loading" label="GitHub Fine-Grained Token" type="password" required
-                clearable hint="Cole seu token de acesso do GitHub" persistent-hint :error="error" />
-        </v-card-text>
-        <v-card-actions>
-            <v-btn :disabled="loading || invalid" block text="Login com GitHub" @click="login" />
-        </v-card-actions>
+        <v-form @submit.prevent="login">
+            <v-card-text>
+                <v-text-field v-model="token" :loading="loading" label="GitHub Fine-Grained Token" type="password"
+                    required @keyup.enter="login" clearable hint="Cole seu token de acesso do GitHub" persistent-hint
+                    :error="error" />
+            </v-card-text>
+            <v-card-actions>
+                <v-btn :disabled="loading || invalid" block text="Login com GitHub" @click="login" />
+            </v-card-actions>
+        </v-form>
         <ErrorBar v-model="showErrorBar" :error-data="errorData" timeout="10000" />
     </v-card>
 </template>

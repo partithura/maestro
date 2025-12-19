@@ -27,16 +27,16 @@ export const useAppStore = defineStore("appStore", {
       this.userInfo = v;
     },
     updateCurrentToken(v) {
-      this.token = v;
+      if (v) this.token = v;
     },
     setUsageCredits(v) {
-      this.usageCredits = v;
+      if (v) this.usageCredits = v;
     },
     setTotalCredits(v) {
-      this.totalCredits = v;
+      if (v) this.totalCredits = v;
     },
     setUsedCredits(v) {
-      this.usedCredits = v;
+      if (v) this.usedCredits = v;
     },
     async updateUser(token) {
       if (!token) {
@@ -62,6 +62,55 @@ export const useAppStore = defineStore("appStore", {
       } catch (error) {
         console.error("Erro ao buscar usuário:", error);
         return false;
+      }
+    },
+    async sendNotification(issueLink, votes) {
+      const githubToken = useCookie("token");
+      if (!githubToken.value) {
+        this.updateCurrentToken(null);
+        throw new Error("Nenhum token disponível.");
+      }
+      try {
+        const response = await $fetch("/api/telegram/send", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${githubToken.value}`,
+            username: this.getCurrentUserInfo.login,
+          },
+          body: {
+            issueLink: issueLink,
+            votes: votes,
+          },
+        });
+        return response;
+      } catch (error) {
+        console.error("Erro ao notificar usuários:", error);
+        throw error;
+      }
+    },
+    async subscribeUser(telegramId) {
+      const githubToken = useCookie("token");
+      if (!githubToken.value) {
+        this.updateCurrentToken(null);
+        throw new Error("Nenhum token disponível.");
+      }
+      try {
+        const updatedUser = await $fetch("/api/user/subscribe", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${githubToken.value}`,
+            username: this.getCurrentUserInfo.login,
+          },
+          body: {
+            telegramId: telegramId,
+            id: this.getCurrentUserInfo.id,
+          },
+        });
+        this.userInfo = updatedUser.data;
+        return updatedUser.data;
+      } catch (error) {
+        console.error("Erro ao atualizar usuário:", error);
+        throw error;
       }
     },
     async updatePrefs(prefs) {
