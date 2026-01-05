@@ -131,6 +131,7 @@ export default defineNitroPlugin(async (nitroApp) => {
 
     async function onVote(socket, config) {
         const timestamp = new Date().getTime();
+        console.warn("votando:", config);
         if (activeRoom?.name) {
             const issueIndex = activeRoom.issues.findIndex((s) => {
                 return s.id == config.issue.id;
@@ -143,7 +144,7 @@ export default defineNitroPlugin(async (nitroApp) => {
                 });
                 if (userIndex >= 0) {
                     activeRoom.issues[issueIndex].votes[userIndex].value =
-                        config.value;
+                        config.val;
                     activeRoom.issues[issueIndex].votes[userIndex].timestamp =
                         timestamp;
                 } else {
