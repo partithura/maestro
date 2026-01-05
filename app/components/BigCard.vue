@@ -9,7 +9,7 @@
         class="">
         <div
             class="card-container"
-            :class="{ selected: isSelected }"
+            :class="{ selected: isSelected, disabled: props.disabled }"
             :style="isSelected ? `background-color: ${cardColor};` : ''"
             @click="switchCard">
             <div class="mini-card">
@@ -40,6 +40,10 @@ const props = defineProps({
         type: String,
         default: "#FFFFFF",
     },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 const isSelected = computed(() => {
     return props.cardSelected == props.cardValue;
@@ -49,9 +53,11 @@ const computedCardValue = computed(() => {
 });
 
 function switchCard() {
-    isSelected.value
-        ? emits("cardUnselected", props.cardValue)
-        : emits("cardSelected", props.cardValue);
+    if (!props.disabled) {
+        isSelected.value
+            ? emits("cardUnselected", props.cardValue)
+            : emits("cardSelected", props.cardValue);
+    }
 }
 </script>
 <style lang="scss" scoped>
@@ -78,6 +84,11 @@ $innerCardBorderWidth: calc($cardOffset / 2);
     align-items: center;
     align-content: center;
     justify-content: center;
+}
+
+.disabled {
+    opacity: 0.75 !important;
+    cursor: not-allowed !important;
 }
 
 .mini-card {

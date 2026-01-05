@@ -2,16 +2,7 @@
     <v-row
         no-gutters
         dense>
-        <v-col cols="12">
-            <div class="d-flex align-center">
-                <v-icon
-                    class="mr-4"
-                    icon="mdi-arrow-left"
-                    @click="goBack()" />
-                <h2>Sala de votação</h2>
-                <v-spacer />
-            </div>
-        </v-col>
+        <DefaultHeader to="/" />
         <v-col cols="12">
             <v-row
                 no-gutters
@@ -19,8 +10,7 @@
                 <VotingBoardStatusBar
                     ref="statusBar"
                     :is-connected="isConnected"
-                    :start-time="startTimerTime"
-                    @connect="connectToServer()" />
+                    :start-time="startTimerTime" />
                 <v-col
                     cols="12"
                     xl="3"
@@ -37,38 +27,19 @@
                             :selected-issue="activeIssue"
                             :is-chart="isChart"
                             :is-connected="isConnected"
+                            :is-selecting="showSelectionScreen"
+                            :users="usersWithVote"
+                            :show-cards="showCards"
+                            :start-timer-time="startTimerTime"
                             @show="requestShowCards"
                             @reset="startTimer"
                             @select="setSelectedIssue"
                             @switch-charts="switchCharts"
                             @skip="requestNextIssue"
                             @clean="clearVotes"
-                            @add="addUserStories"
+                            @add="toggleAddUserStories"
                             @end="checkSessionStatus"
                             @finalize="setIssueDifficulty" />
-                        <v-sheet
-                            class="pa-1 scrollable-content"
-                            variant="outlined">
-                            <template v-if="users.length">
-                                <UserCard
-                                    v-for="user in users"
-                                    :key="user.id"
-                                    :user="user"
-                                    :show-cards="showCards"
-                                    :timer="startTimerTime" />
-                            </template>
-                            <v-card
-                                v-else
-                                height="80px"
-                                :rounded="0"
-                                variant="elevated"
-                                hover
-                                class="mx-auto">
-                                <v-card-text class="text-center">
-                                    Aguardando usuários...
-                                </v-card-text>
-                            </v-card>
-                        </v-sheet>
                     </v-sheet>
                 </v-col>
                 <v-col
@@ -89,6 +60,7 @@
                             <CardDeck
                                 :card-selected="voteValue"
                                 :cards="computedCards"
+                                :disabled="cardsDisabled"
                                 @card-selected="setSelectedCard"
                                 @card-unselected="deselectCard"
                                 @choose-card="chooseCard" />
@@ -124,29 +96,47 @@ import { Bar } from "vue-chartjs";
 
 definePageMeta({
     layout: "app",
-    name: "Votação",
+    name: "Sala de Votação",
 });
 const userStore = useUserStore();
-const startTimerTime = ref(0);
+const cardStore = useCardStore();
+const navigationStore = useNavigationStore();
 let socket;
+const startTimerTime = ref(0);
 const users = ref([]);
 const voteValue = ref(null);
 const showCards = ref(false);
 const isChart = ref(false);
+const showSelectionScreen = ref(false);
 const endTimerTime = ref(0);
 const statusBar = ref();
-const showSelectionScreen = ref(false);
 const roomName = ref("");
+const activeIssue = ref();
+const issues = ref([]);
 
-const chartData = ref({
-    labels: ["1 Ponto", "2 Pontos", "3 Pontos", "Indeciso"],
-    datasets: [
-        {
-            label: "",
-            backgroundColor: ["#f87979", "#ff0000", "#00FF00", "#0000FF"],
-            data: [1, 2, 3, 1],
-        },
-    ],
+const usersWithVote = computed(() => {
+    return users.value.map((u) => {
+        return {
+            ...u,
+            vote: activeIssue.value?.votes?.find((v) => {
+                return v.user.id == u.id;
+            })?.value,
+        };
+    });
+});
+
+const chartData = computed(() => {
+    const filteredData = activeIssue.value.votes; //filtrar por votos que existam
+    return {
+        labels: ["1 Ponto", "2 Pontos", "3 Pontos", "Indeciso"], //filteredData.labels
+        datasets: [
+            {
+                label: "",
+                backgroundColor: ["#f87979", "#ff0000", "#00FF00", "#0000FF"], //gerar com função
+                data: [1, 2, 3, 1], //filteredData.data
+            },
+        ],
+    };
 });
 const chartOptions = ref({
     responsive: true,
@@ -158,49 +148,12 @@ const chartOptions = ref({
     },
 });
 
-const activeIssue = ref();
-const issues = ref([]);
-
 const computedCards = computed(() => {
-    //carregar da API depois
-    return [
-        {
-            value: 0,
-            tooltip: "Sem esforço significativo",
-        },
-        {
-            value: 1,
-            tooltip: "Até 1h de esforço",
-        },
-        {
-            value: 2,
-            tooltip: "Entre 1h e 2h de esforço",
-        },
-        {
-            value: 3,
-            tooltip: "Entre 1h:30m e 4h de esforço",
-        },
-        {
-            value: 5,
-            tooltip: "Entre 3h:30m e 8h de esforço",
-        },
-        {
-            value: 8,
-            tooltip: "Entre 7h e 14h de esforço",
-        },
-        {
-            value: 13,
-            tooltip: "Entre 12h e 24h de esforço",
-        },
-        {
-            value: 21,
-            tooltip: "Mais que 24h (quebrar)",
-        },
-        {
-            value: "?",
-            tooltip: "Não tenho certeza",
-        },
-    ];
+    return cardStore.getCards;
+});
+
+const cardsDisabled = computed(() => {
+    return cardStore.getLoading || !isConnected.value || !activeIssue.value;
 });
 
 const isManagement = computed(() => {
@@ -213,8 +166,8 @@ function addIssues(issues) {
     socket.emit("requestAddIssues", issues);
 }
 
-function addUserStories() {
-    showSelectionScreen.value = true;
+function toggleAddUserStories(v) {
+    showSelectionScreen.value = !v;
 }
 
 function setSelectedCard(v) {
@@ -251,7 +204,10 @@ function onSessionEnd(reason) {
 }
 
 function chooseCard() {
-    socket.emit("vote", voteValue.value);
+    socket.emit("vote", {
+        issue: activeIssue.value,
+        val: voteValue.value,
+    });
 }
 
 function setSelectedIssue(issue) {
@@ -370,15 +326,27 @@ function onDisconnect() {
     transport.value = "N/A";
 }
 
+function shutdown() {
+    if (socket) {
+        socket.emit("disconnectRequest", {});
+        socket.off("connect", onConnect);
+        socket.off("disconnect", onDisconnect);
+    }
+}
 onBeforeUnmount(() => {
-    socket.emit("disconnectRequest", {});
-    socket.off("connect", onConnect);
-    socket.off("disconnect", onDisconnect);
+    shutdown();
 });
 onBeforeRouteLeave(() => {
-    socket.emit("disconnectRequest", {});
-    socket.off("connect", onConnect);
-    socket.off("disconnect", onDisconnect);
+    shutdown();
+});
+onMounted(() => {
+    navigationStore.setBreadcrumbs([
+        {
+            title: `Sala de Votação`,
+            disabled: true,
+            to: `/ChatRoom`,
+        },
+    ]);
 });
 </script>
 <style lang="scss" scoped>

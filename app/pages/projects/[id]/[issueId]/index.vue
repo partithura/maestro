@@ -1,23 +1,22 @@
 <template>
-    <v-row no-gutters dense>
-        <v-col cols="12">
-            <div class="d-flex align-center">
-                <v-icon class="mr-4" @click="goBack()" icon="mdi-arrow-left" />
-                <h2>Issue {{ issueNumber }}:</h2>
-            </div>
+    <v-row
+        no-gutters
+        dense>
+        <DefaultHeader
+            :to="`/projects/${projectId}`"
+            :title="issueNumber" />
+        <v-col
+            cols="12"
+            md="7">
+            <v-sheet> Área destinada a issue: {{ issueId }} </v-sheet>
         </v-col>
-        <v-col cols="12" md="7">
-            <v-sheet>
-                Área destinada a issue: {{ issueId }}
-            </v-sheet>
-        </v-col>
-        <v-col cols="12" md="5">
+        <v-col
+            cols="12"
+            md="5">
             <v-sheet>
                 <v-row no-gutters>
                     <v-col cols="12">
-                        <v-sheet>
-                            Área destinada a votação
-                        </v-sheet>
+                        <v-sheet> Área destinada a votação </v-sheet>
                     </v-col>
                     <v-col cols="12">
                         <v-btn block>Votar</v-btn>
@@ -30,25 +29,25 @@
     </v-row>
 </template>
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRoute } from "vue-router";
 definePageMeta({
-    layout: 'app',
-    name: 'Issue'
-})
-const navigationStore = useNavigationStore()
+    layout: "app",
+    name: "Issue",
+});
+const navigationStore = useNavigationStore();
 const route = useRoute();
 const issueId = computed(() => {
-    return route.params.issueId
-})
+    return route.params.issueId;
+});
 const issueNumber = computed(() => {
-    return route.params.issueId
-})
+    return route.params.issueId;
+});
 const projectId = computed(() => {
-    return route.params.id
-})
+    return route.params.id;
+});
 
 function goBack() {
-    navigateTo(`/projects/${projectId.value}`)
+    navigateTo(`/projects/${projectId.value}`);
 }
 
 onMounted(() => {
@@ -68,9 +67,10 @@ onMounted(() => {
             disabled: true,
             to: `/projects/${projectId.value}/${issueId.value}`,
         },
-    ])
-})
+    ]);
+});
 </script>
 <style lang="scss" scoped>
-.area {}
+.area {
+}
 </style>
