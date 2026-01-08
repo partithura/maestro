@@ -4,6 +4,7 @@ import ErrorLog from "../../models/error.model";
 import Issue from "../../models/issue.model";
 import { env } from "~~/server/support/env";
 import { triggerSSEEvent } from "../../utils/sse";
+import { LIST_PROJECT_ISSUES } from "../../utils/querys";
 
 export default defineEventHandler(async (event) => {
   // Obter o token do header Authorization
@@ -21,15 +22,11 @@ export default defineEventHandler(async (event) => {
   const {
     projectNumber,
     org,
-    itemId,
     q = "",
     paginationSize = 10,
-    after,
-    before,
+    after
   } = body;
-  const headers = {
-    "X-GitHub-Api-Version": "2022-11-28",
-  };
+
 
   if (!projectNumber || !org) {
     throw createError({
@@ -38,17 +35,13 @@ export default defineEventHandler(async (event) => {
     });
   }
   try {
-    const response = await octokit.request(
-      `GET /orgs/{org}/projectsV2/{project_number}/items`,
+    const response = await octokit.graphql(
+      LIST_PROJECT_ISSUES,
       {
-        project_number: projectNumber,
-        org: org,
-        itemId: itemId,
-        headers: headers,
-        q: q,
-        per_page: paginationSize,
-        after,
-        before,
+        projectNumber,
+        org,
+        paginationSize,
+        after
       }
     );
     const mongoResponse = await Issue.find();
@@ -57,20 +50,89 @@ export default defineEventHandler(async (event) => {
       details: body,
     });
 
-    if (response.errors) {
-      throw new Error(response.errors[0].message);
-    }
     if (mongoResponse.errors) {
       throw new Error(mongoResponse.errors[0].message);
     }
 
-    const issues = response.data;
-    const responseHeaders = response.headers;
+    const issues = response;
+    // EXEMPLO DE RETORNO
+		// "organization": {
+		// 	"projectV2": {
+		// 		"id": "PVT_kwDOBhlNGs4BKpQd",
+		// 		"items": {
+		// 			"nodes": [
+		// 				{
+		// 					"id": "PVTI_lADOBhlNGs4BKpQdzgisqco",
+		// 					"content": {
+		// 						"id": "I_kwDOQOV9587e1QBl",
+		// 						"number": 13,
+		// 						"title": "abc",
+		// 						"body": "lorem ipsum",
+		// 						"state": "OPEN",
+		// 						"url": "https://github.com/partithura-estagiarios/escala-de-estagiarios/issues/13",
+		// 						"createdAt": "2025-12-17T11:28:58Z",
+		// 						"updatedAt": "2026-01-07T17:17:11Z",
+		// 						"author": {
+		// 							"avatarUrl": "https://avatars.githubusercontent.com/u/239580054?v=4",
+		// 							"login": "lfelipeDutra"
+		// 						},
+		// 						"repository": {
+		// 							"name": "escala-de-estagiarios",
+		// 							"owner": {
+		// 								"login": "partithura-estagiarios"
+		// 							}
+		// 						},
+		// 						"issueType": {
+		// 							"color": "RED",
+		// 							"description": "An unexpected problem or behavior",
+		// 							"name": "Bug"
+		// 						},
+		// 						"labels": {
+		// 							"nodes": [
+		// 								{
+		// 									"color": "d73a4a",
+		// 									"description": "Something isn't working",
+		// 									"id": "LA_kwDOQOV9588AAAACOsRMLA",
+		// 									"name": "bug"
+		// 								},
+		// 								{
+		// 									"color": "0075ca",
+		// 									"description": "Improvements or additions to documentation",
+		// 									"id": "LA_kwDOQOV9588AAAACOsRMNQ",
+		// 									"name": "documentation"
+		// 								},
+		// 								{
+		// 									"color": "cfd3d7",
+		// 									"description": "This issue or pull request already exists",
+		// 									"id": "LA_kwDOQOV9588AAAACOsRMOA",
+		// 									"name": "duplicate"
+		// 								}
+		// 							]
+		// 						},
+		// 						"assignees": {
+		// 							"nodes": [
+		// 								{
+		// 									"avatarUrl": "https://avatars.githubusercontent.com/u/239580054?v=4",
+		// 									"name": "Luiz Felipe",
+		// 									"login": "lfelipeDutra"
+		// 								}
+		// 							]
+		// 						},
+		// 						"milestone": null
+		// 					}
+		// 				}
+		// 			],
+		// 			"pageInfo": {
+		// 				"hasNextPage": true,
+		// 				"endCursor": "Y3Vyc29yOnYyOpKqMDAwMDAwMDEuMM4IrKnK"
+		// 			}
+		// 		}
+		// 	}
+		// }
 
     return {
       issues: issues,
       mongo: mongoResponse,
-      headers: responseHeaders,
     };
   } catch (error) {
     console.error(error);
@@ -86,7 +148,7 @@ export default defineEventHandler(async (event) => {
     await newError.save(); // Salvar a nova issue no banco
     throw createError({
       statusCode: 500,
-      message: `Falha ao buscar issues do GitHub via REST: ${error}`,
+      message: `Falha ao buscar issues do GitHub via GraphQL: ${error}`,
     });
   }
 });

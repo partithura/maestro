@@ -1,13 +1,11 @@
 import { Octokit } from "octokit";
-const config = useRuntimeConfig();
-
-const { organizationName } = config;
+import { DELETE_ISSUE_COMMENT } from "../../utils/mutations";
 
 export default defineEventHandler(async (event) => {
   // Obter o token do header Authorization
   const authHeader = getHeader(event, "Authorization");
   const body = await readBody(event);
-  const { repo, comment_id } = body;
+  const { commentId } = body;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw createError({
@@ -28,18 +26,19 @@ export default defineEventHandler(async (event) => {
     auth: githubToken,
   });
   try {
-    const response = await octokit.request(
-      "DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}",
+    const response = await octokit.graphql(
+      DELETE_ISSUE_COMMENT,
       {
-        owner: organizationName,
-        repo: repo,
-        comment_id: comment_id,
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
+        commentId,
       }
     );
-    return response.data;
+    return response;
+    // EXEMPLO DE RETORNO
+    // Não tem mais nada a ser retornado e retorna sempre null
+    // "deleteIssueComment": {
+    //   "clientMutationId": null
+    // }
+
   } catch (e) {
     return `Erro na validação: ${e}`;
   }

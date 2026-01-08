@@ -28,21 +28,19 @@ export default defineEventHandler(async (event) => {
     auth: githubToken,
   });
   try {
-    const isAuthenticated = await octokit.request("GET /user", {
+    await octokit.request("GET /user", {
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
       },
     });
 
     const { issueId } = getQuery(event);
-    if (isAuthenticated) {
       try {
         const existingIssue = await Issue.findOne({ id: issueId });
         return existingIssue;
       } catch (error) {
         return `Não foi possível executar a operação: ${error.message}`;
       }
-    }
   } catch (e) {
     return `Erro na validação: ${e}`;
   }

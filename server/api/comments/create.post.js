@@ -1,13 +1,11 @@
 import { Octokit } from "octokit";
-const config = useRuntimeConfig();
-
-const { organizationName } = config;
+import { ADD_ISSUE_COMMENT } from "../../utils/mutations";
 
 export default defineEventHandler(async (event) => {
   // Obter o token do header Authorization
   const authHeader = getHeader(event, "Authorization");
   const body = await readBody(event);
-  const { repo, issue_number, comment_body } = body;
+  const { issueId, commentBody } = body;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw createError({
@@ -28,19 +26,29 @@ export default defineEventHandler(async (event) => {
     auth: githubToken,
   });
   try {
-    const response = await octokit.request(
-      "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+    const response = await octokit.graphql(
+      ADD_ISSUE_COMMENT,
       {
-        owner: organizationName,
-        repo: repo,
-        issue_number: issue_number,
-        body: comment_body,
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
+        issueId,
+        body: commentBody
+
       }
     );
-    return response.data;
+    return response;
+    // EXEMPLO DE RETORNO
+		// "addComment": {
+		// 	"commentEdge": {
+		// 		"node": {
+		// 			"id": "IC_kwDOQOV9587dojjB",
+		// 			"body": "segndo comentário",
+		// 			"createdAt": "2026-01-07T11:14:53Z",
+		// 			"author": {
+		// 				"login": "lfelipeDutra"
+		// 			}
+		// 		}
+		// 	}
+		// }
+
   } catch (e) {
     return `Erro na validação: ${e}`;
   }

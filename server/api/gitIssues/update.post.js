@@ -1,8 +1,9 @@
 import { Octokit } from "octokit";
+import { UPDATE_ISSUE_FIELD_DIFICULDADE } from "../../utils/mutations";
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const organizationName = config.organizationName;
-  const field_id = 185093514; //Field ID do campo dificuldade consolidada
+  const fieldId = 185093514; //Field ID do campo dificuldade consolidada
 
   // Verifica se organizationName está definido
   if (!organizationName) {
@@ -24,41 +25,34 @@ export default defineEventHandler(async (event) => {
 
   // Extrai o corpo da requisição
   const body = await readBody(event);
-  const { projectNumber, issueNumber, dificuldade } = body;
+  const { projectId, itemId, dificuldade } = body;
 
-  if (typeof projectNumber !== "number" || typeof dificuldade !== "number") {
+  if (typeof dificuldade !== "number") {
     throw createError({
       statusCode: 400,
-      message: "projectNumber e dificuldade devem ser números.",
+      message: "dificuldade deve ser um número.",
     });
   }
-
 
   try {
 
     const octokit = new Octokit({
         auth: token,
     });
-
-    const item = await octokit.request("GET /orgs/{org}/projectsV2/{project_number}/items",{
-        org:organizationName,
-        project_number:projectNumber,
-        q:`#${issueNumber}`
-    })
-    const itemId = item.data[0]?.id
     
-    const response = await octokit.request("PATCH /orgs/{org}/projectsV2/{project_number}/items/{item_id}",{
-        org:organizationName,
-        project_number: projectNumber,
-        item_id:itemId,
-        fields:[
-            {
-                id:field_id, //field dificuldade consolidada
-                value:dificuldade
-            }
-        ]
+    const response = await octokit.graphql(UPDATE_ISSUE_FIELD_DIFICULDADE,
+      {
+        projectId,
+        itemId,
+        fieldId,
+        value: dificuldade
       })
-
+    // EXEMPLO DE RETORNO      
+		// "updateProjectV2ItemFieldValue": {
+		// 	"projectV2Item": {
+		// 		"id": "PVTI_lADOBhlNGs4BKpQdzgisqco"
+		// 	}
+		// }
 
     if (response.errors) {
       throw createError({

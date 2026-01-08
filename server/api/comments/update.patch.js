@@ -1,13 +1,11 @@
 import { Octokit } from "octokit";
-const config = useRuntimeConfig();
-
-const { organizationName } = config;
+import { UPDATE_ISSUE_COMMENT } from "../../utils/mutations"
 
 export default defineEventHandler(async (event) => {
   // Obter o token do header Authorization
   const authHeader = getHeader(event, "Authorization");
   const body = await readBody(event);
-  const { repo, comment_id, comment_body } = body;
+  const { commentId, commentBody } = body;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     throw createError({
@@ -28,19 +26,27 @@ export default defineEventHandler(async (event) => {
     auth: githubToken,
   });
   try {
-    const response = await octokit.request(
-      "PATCH /repos/{owner}/{repo}/issues/comments/{comment_id}",
+    const response = await octokit.graphql(
+      UPDATE_ISSUE_COMMENT,
       {
-        owner: organizationName,
-        repo: repo,
-        comment_id: comment_id,
-        body: comment_body,
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
+        commentId,
+        body: commentBody,
       }
     );
-    return response.data;
+    return response;
+    // EXEMPLO DE RETORNO
+		// "updateIssueComment": {
+		// 	"issueComment": {
+		// 		"body": "update dnv",
+		// 		"createdAt": "2026-01-06T17:23:37Z",
+		// 		"updatedAt": "2026-01-07T11:14:16Z",
+		// 		"author": {
+		// 			"login": "lfelipeDutra",
+		// 			"avatarUrl": "https://avatars.githubusercontent.com/u/239580054?v=4"
+		// 		}
+		// 	}
+		// }
+
   } catch (e) {
     return `Erro na validação: ${e}`;
   }
