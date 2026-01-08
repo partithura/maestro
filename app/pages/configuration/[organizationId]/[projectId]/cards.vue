@@ -10,7 +10,12 @@
                     <h2>Baralho:</h2>
                     <v-sheet class="pa-4">
                         <h3>Cartas incluidas no projeto:</h3>
-                        <div class="d-flex mb-4">
+                        <v-skeleton-loader
+                            v-if="loading"
+                            height="225px" />
+                        <div
+                            v-else
+                            class="d-flex mb-4">
                             <VueDraggable
                                 v-model="projectCards"
                                 :group="{
@@ -40,7 +45,12 @@
                             </VueDraggable>
                         </div>
                         <h3>Cartas disponíveis:</h3>
-                        <div class="d-flex mb-4">
+                        <v-skeleton-loader
+                            v-if="loading"
+                            height="213px" />
+                        <div
+                            v-else
+                            class="d-flex mb-4">
                             <VueDraggable
                                 v-model="organizationCards"
                                 :sort="false"
@@ -81,6 +91,8 @@
                             <v-btn
                                 prepend-icon="mdi-check"
                                 text="Salvar"
+                                :disabled="loading"
+                                :loading="loading"
                                 @click="saveCards" />
                         </div>
                     </v-sheet>
@@ -137,6 +149,11 @@ const organizationCards = computed({
 const newCardModal = ref(false);
 const deleteCardModal = ref(false);
 const selectedCard = ref(null);
+
+const loading = ref(false);
+// const loading = computed(() => {
+//     return cardStore.getLoading || projectStore.getLoading;
+// });
 
 const projectCards = computed({
     get() {
