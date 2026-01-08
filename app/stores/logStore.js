@@ -43,5 +43,30 @@ export const useLogStore = defineStore("logStore", {
             //chamar endpoint do github
             this.loading = false;
         },
+        removeAllAlerts() {
+            this.errorLog = [];
+        },
+        removeAlert(id) {
+            const index = this.errorLog.findIndex((e) => {
+                return e.id == id;
+            });
+            if (index >= 0) {
+                this.errorLog.splice(index, 1);
+            }
+        },
+        createAlert(alert) {
+            const defaultAlert = Object.assign(
+                {
+                    icon: "mdi-alert",
+                    type: "error",
+                    title: "Erro:",
+                    text: "Um erro desconhecido ocorreu.",
+                    timestamp: new Date().getTime(),
+                    id: crypto.randomUUID(),
+                },
+                alert
+            );
+            this.errorLog.push(defaultAlert);
+        },
     },
 });

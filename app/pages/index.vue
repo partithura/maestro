@@ -19,6 +19,23 @@
                 <div class="px-4 py-2">Ver Projetos</div>
             </v-btn>
         </v-col>
+
+        <v-col
+            v-if="isManagement"
+            cols="12"
+            md="6"
+            lg="4"
+            xl="3"
+            xxl="2">
+            <v-btn
+                to="/configuration"
+                height="120px"
+                block
+                size="x-large">
+                <div class="px-4 py-2">Configurações</div>
+            </v-btn>
+        </v-col>
+
         <v-col
             cols="12"
             md="6"
@@ -46,6 +63,11 @@ definePageMeta({
     name: "Dashboard",
 });
 const navigationStore = useNavigationStore();
+const userStore = useUserStore();
+
+const isManagement = computed(() => {
+    return userStore.getUser?.isManagement;
+});
 onMounted(() => {
     navigationStore.setBreadcrumbs([]);
 });

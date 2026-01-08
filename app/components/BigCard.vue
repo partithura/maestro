@@ -1,25 +1,16 @@
 <template>
-    <v-col
-        cols="6"
-        sm="3"
-        md="3"
-        lg="1"
-        xl="1"
-        xxl="1"
-        class="">
-        <div
-            class="card-container"
-            :class="{ selected: isSelected, disabled: props.disabled }"
-            :style="isSelected ? `background-color: ${cardColor};` : ''"
-            @click="switchCard">
-            <div class="mini-card">
-                <div>
-                    <h4 class="text-center">{{ computedCardValue }}</h4>
-                    <h5 class="text-center">{{ cardTooltip }}</h5>
-                </div>
+    <div
+        class="card-container"
+        :class="{ selected: isSelected, disabled: props.disabled }"
+        :style="isSelected ? `background-color: ${cardColor};` : ''"
+        @click="switchCard">
+        <div class="mini-card">
+            <div>
+                <h4 class="text-center">{{ computedCardValue }}</h4>
+                <h5 class="text-center">{{ cardTooltip }}</h5>
             </div>
         </div>
-    </v-col>
+    </div>
 </template>
 <script setup>
 const emits = defineEmits(["cardSelected", "cardUnselected"]);

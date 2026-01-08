@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
                 color: body.color,
             });
             await newCard.save(); // Salvar a nova issue no banco
-            const response = await Card.find({}, { _id: 0 });
+            const response = await Card.find({}, { __v: 0 });
             return response;
         } else {
             throw createError({

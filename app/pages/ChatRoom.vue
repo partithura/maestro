@@ -34,6 +34,7 @@
                             @show="requestShowCards"
                             @reset="startTimer"
                             @select="setSelectedIssue"
+                            @remove="removeSelectedIssue"
                             @switch-charts="switchCharts"
                             @skip="requestNextIssue"
                             @clean="clearVotes"
@@ -101,6 +102,7 @@ definePageMeta({
 const userStore = useUserStore();
 const cardStore = useCardStore();
 const navigationStore = useNavigationStore();
+const logStore = useLogStore();
 let socket;
 const startTimerTime = ref(0);
 const users = ref([]);
@@ -199,7 +201,12 @@ function requestEndSession() {
 }
 
 function onSessionEnd(reason) {
-    window.alert(reason);
+    logStore.createAlert({
+        title: "Sala finalizada",
+        text: reason,
+        type: "primary",
+        icon: "mdi-close-network",
+    });
     navigateTo("/");
 }
 
@@ -214,6 +221,11 @@ function setSelectedIssue(issue) {
     if (isManagement.value) {
         socket.emit("requestSetActiveIssue", issue);
         activeIssue.value = issue;
+    }
+}
+function removeSelectedIssue(issue) {
+    if (isManagement.value) {
+        socket.emit("requestIssueRemove", issue);
     }
 }
 

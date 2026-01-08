@@ -3,29 +3,30 @@ import Project from "~~/server/models/project.model";
 import { env } from "~~/server/support/env";
 
 export default defineEventHandler(async (event) => {
-  await mongoose.connect(env.MONGODB_CONNECTION_STRING);
-  const body = await readBody(event);
-  try {
-    const newProject = new Project({
-      number: body.number,
-      query: body.query,
-      name: body.name,
-      isActive: body.isActive,
-    });
-    if (body.isActive) {
-      await Project.updateMany(
-        {},
-        {
-          $set: { isActive: false },
+    await mongoose.connect(env.MONGODB_CONNECTION_STRING);
+    const body = await readBody(event);
+    try {
+        const newProject = new Project({
+            number: body.number,
+            query: body.query,
+            name: body.name,
+            isActive: body.isActive,
+            config: body.config,
+        });
+        if (body.isActive) {
+            await Project.updateMany(
+                {},
+                {
+                    $set: { isActive: false },
+                }
+            );
         }
-      );
+        const response = await newProject.save();
+        return response;
+    } catch (error) {
+        throw createError({
+            statusCode: 500,
+            message: `Não foi possível executar a operação: ${error.message}`,
+        });
     }
-    const response = await newProject.save();
-    return response;
-  } catch (error) {
-    throw createError({
-      statusCode: 500,
-      message: `Não foi possível executar a operação: ${error.message}`,
-    });
-  }
 });

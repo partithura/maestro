@@ -109,7 +109,7 @@
                     md="12">
                     <v-select
                         v-model="finalValue"
-                        :disabled="!isConnected"
+                        :disabled="isSetValueDisabled"
                         density="compact"
                         :items="possibleValues"
                         :loading="loading"
@@ -123,7 +123,7 @@
                     lg="12"
                     md="12">
                     <v-btn
-                        :disabled="!isConnected"
+                        :disabled="isSetValueDisabled"
                         text="Definir dificuldade"
                         :loading="loading"
                         block
@@ -140,9 +140,11 @@
                     <VotingBoardIssueItem
                         :is-management="isManagement"
                         :issue="issue"
+                        :is-selecting="isSelecting"
                         :selected-issue="selectedIssue"
                         :index="n"
-                        @select="selectIssue" />
+                        @select="selectIssue"
+                        @remove="removeIssue" />
                 </v-row>
             </v-sheet>
             <v-sheet
@@ -183,6 +185,7 @@ const emits = defineEmits([
     "select",
     "switchCharts",
     "add",
+    "remove",
 ]);
 const props = defineProps({
     issues: {
@@ -236,6 +239,10 @@ const possibleValues = computed(() => {
         });
 });
 
+const isSetValueDisabled = computed(() => {
+    return !props.isConnected || !possibleValues.value?.length;
+});
+
 const loading = computed(() => {
     return cardStore.getLoading;
 });
@@ -252,6 +259,9 @@ function switchCharts() {
 }
 function selectIssue(issue) {
     emits("select", issue);
+}
+function removeIssue(issue) {
+    emits("remove", issue);
 }
 function resetTimer() {
     emits("reset");
@@ -274,9 +284,6 @@ function defineFinalValue() {
 function addUserStories() {
     emits("add", props.isSelecting);
 }
-onMounted(() => {
-    cardStore.fetchCards();
-});
 </script>
 <style lang="scss" scoped>
 .scrollable-content {

@@ -53,35 +53,16 @@
             <template v-else>
                 <template v-if="issues.length">
                     <v-col
-                        v-for="n in issues"
-                        :key="n"
+                        v-for="issue in issues"
+                        :key="issue.id"
                         cols="10"
                         md="6"
                         lg="4"
                         xl="3"
                         xxl="2">
-                        <v-card
-                            height="180px"
-                            @click="openIssue(n)">
-                            <v-toolbar density="compact">
-                                <template #prepend>
-                                    <v-chip
-                                        class="ml-3"
-                                        color="yellow"
-                                        >Task</v-chip
-                                    >
-                                </template>
-                                <template #title> Issue {{ n }} </template>
-                            </v-toolbar>
-                            <v-card-text>
-                                Lorem ipsum dolor sit amet consectetur
-                                adipisicing elit. Iure id inventore porro
-                                nesciunt pariatur voluptatum labore maxime
-                                consequuntur et eveniet, voluptatem aliquam
-                                fugiat corrupti, quisquam sed esse quidem
-                                quaerat accusantium.
-                            </v-card-text>
-                        </v-card>
+                        <issue-card
+                            :issue="issue"
+                            @click="openIssue(issue.number)" />
                     </v-col>
                 </template>
                 <template v-else>
@@ -102,36 +83,27 @@ definePageMeta({
     name: "Issues do Projeto",
 });
 const navigationStore = useNavigationStore();
+const issueStore = useIssueStore();
 const route = useRoute();
 const isManagement = ref(true);
 const projectId = computed(() => {
     return route.params.id;
 });
 
-//Toda tela deve ser composta por 4 estados:
-// - Loading <- a informação está sendo obtida de um endpoint
-// - Success <- a informação foi obtida com sucesso
-// - Error <- Houve um erro no processo de obtenção dos dados
-// - NoData <- Não há dados retornados pelo endpoint
-const loading = ref(true);
+const loading = computed(() => {
+    return issueStore.getLoading;
+});
 const error = ref(false);
 
 const issues = computed(() => {
-    return [1234, 3232, 444, 5425];
+    return issueStore.getIssues;
 });
 
 function configProject() {
     console.log("configurar projeto");
 }
 
-function goBack() {
-    navigateTo(`/projects_`);
-}
-
 onMounted(() => {
-    setTimeout(() => {
-        loading.value = false;
-    }, 200);
     navigationStore.setBreadcrumbs([
         {
             title: `Projetos`,

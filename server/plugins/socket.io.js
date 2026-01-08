@@ -205,6 +205,31 @@ export default defineNitroPlugin(async (nitroApp) => {
         }
     }
 
+    async function removeIssue(issue) {
+        if (issue) {
+            //só executa a função se houver issue para remover
+            const index = activeRoom.issues.findIndex((i) => {
+                return i.id == issue.id;
+            });
+            if (index >= 0) {
+                activeRoom.issues.splice(index, 1); //remove a issue da sessão ativa
+            }
+            if (activeRoom.activeIssue?.id == issue.id) {
+                activeRoom.activeIssue = null;
+            }
+
+            await Room.findOneAndUpdate(
+                //salva a sessão no banco
+                { name: activeRoom.name },
+                {
+                    issues: activeRoom.issues,
+                    activeIssue: activeRoom.activeIssue,
+                }
+            );
+            updateStatus();
+        }
+    }
+
     async function createNewRoom(config, socket) {
         //Encontrar o usuário que quer criar a sala
         const user = await User.findOne(
@@ -280,6 +305,9 @@ export default defineNitroPlugin(async (nitroApp) => {
 
         //adicionar uma issue a sala de votação
         socket.on("requestAddIssues", addIssues);
+
+        //remover uma issue da sala de votação
+        socket.on("requestIssueRemove", removeIssue);
 
         //desconectar da sala
         socket.on("disconnectRequest", () => onDisconnectRequest(socket));

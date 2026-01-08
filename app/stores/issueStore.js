@@ -20,9 +20,13 @@ export const useIssueStore = defineStore("issueStore", {
         getIssues: (state) => {
             return state.issues;
         },
+        getLoading: (state) => {
+            return state.loading;
+        },
     },
     actions: {
         fetchIssues() {
+            // const logStore = useLogStore();
             this.loading = true;
             //chamar endpoint das issues
             //chamar endpoint do github

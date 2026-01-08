@@ -5,19 +5,28 @@
         justify-xl="center">
         <v-skeleton-loader
             v-if="loading"
-            type="article" />
+            width="100%"
+            type="card" />
         <template v-else>
             <template v-if="cards?.length">
-                <BigCard
+                <v-col
                     v-for="card in cards"
                     :key="card.value"
-                    :disabled="props.disabled"
-                    :card-value="card.value"
-                    :card-color="card.color"
-                    :card-tooltip="card.tooltip"
-                    :card-selected="cardSelected"
-                    @card-selected="setSelectedCard"
-                    @card-unselected="deselectCard" />
+                    cols="6"
+                    sm="3"
+                    md="3"
+                    lg="1"
+                    xl="1"
+                    xxl="1">
+                    <BigCard
+                        :disabled="props.disabled"
+                        :card-value="card.value"
+                        :card-color="card.color"
+                        :card-tooltip="card.tooltip"
+                        :card-selected="cardSelected"
+                        @card-selected="setSelectedCard"
+                        @card-unselected="deselectCard" />
+                </v-col>
             </template>
             <template v-else>
                 <div class="pa-8 text-center">
@@ -39,10 +48,15 @@
         <CardCalculator
             :disabled="props.disabled"
             @value-calculated="setSelectedCard" />
+        <v-btn
+            v-if="isManagement"
+            variant="text"
+            icon="mdi-cog" />
     </v-row>
 </template>
 <script setup>
 const cardStore = useCardStore();
+const userStore = useUserStore();
 const emits = defineEmits(["cardSelected", "cardUnselected", "chooseCard"]);
 
 const props = defineProps({
@@ -54,6 +68,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+});
+
+const isManagement = computed(() => {
+    return userStore.getUser.isManagement;
 });
 
 const cards = computed(() => {
@@ -81,10 +99,4 @@ function deselectCard(v) {
 function chooseCard() {
     emits("chooseCard");
 }
-onMounted(() => {
-    cardStore.fetchCards().catch((err) => {
-        console.log("ERROR:", err);
-        //tratar erro
-    });
-});
 </script>

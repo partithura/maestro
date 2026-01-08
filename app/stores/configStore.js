@@ -8,20 +8,6 @@ export const useConfigStore = defineStore("configStore", {
                 color: "#aaffbb",
             },
         ],
-        projects: [
-            {
-                number: 14,
-                name: "Partithura/25",
-                query: "",
-                isActive: true,
-            },
-            {
-                number: 17,
-                name: "Migração Partithura Vue 3",
-                query: "",
-                isActive: true,
-            },
-        ],
         modules: [
             {
                 text: "Componente",
@@ -82,9 +68,6 @@ export const useConfigStore = defineStore("configStore", {
         getRepositoriesConfig: (state) => {
             return state.repositories;
         },
-        getProjectsConfig: (state) => {
-            return state.projects;
-        },
         getModulesConfig: (state) => {
             return state.modules;
         },
@@ -97,6 +80,7 @@ export const useConfigStore = defineStore("configStore", {
     },
     actions: {
         fetchConfig() {
+            // const logStore = useLogStore();
             this.loading = true;
             //chamar endpoint das configurações
             this.loading = false;

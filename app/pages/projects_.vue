@@ -23,19 +23,7 @@
             </v-col>
         </template>
         <template v-else>
-            <template v-if="error">
-                <v-col
-                    cols="12"
-                    lg="8"
-                    xxl="6"
-                    class="bg-error">
-                    <div class="text-center pt-12">
-                        Houve um erro ao tentar carregar os projetos:
-                    </div>
-                    <div class="text-center pb-12">{{ error }}</div>
-                </v-col>
-            </template>
-            <template v-else-if="projects.length">
+            <template v-if="projects.length">
                 <v-col
                     v-for="project in projects"
                     :key="project.number"
@@ -79,31 +67,18 @@ definePageMeta({
     name: "Projetos",
 });
 const navigationStore = useNavigationStore();
-const loading = ref(true);
-const error = ref(false);
-const isManagement = ref(true);
+const projectStore = useProjectStore();
+const loading = computed(() => {
+    return projectStore.getLoading;
+});
+
 const projects = computed(() => {
-    return [
-        {
-            number: 14,
-            issuesWaiting: 5,
-            name: "Partithura 25",
-            isActive: true,
-        },
-        {
-            number: 17,
-            issuesWaiting: 2,
-            name: "Migração Partithura",
-            isActive: false,
-        },
-    ];
+    return projectStore.getProjects;
 });
 function configProjects() {
     console.log("Config projects");
 }
-function goBack() {
-    navigateTo(`/`);
-}
+
 onMounted(() => {
     navigationStore.setBreadcrumbs([
         {
@@ -112,8 +87,5 @@ onMounted(() => {
             to: `/projects_`,
         },
     ]);
-    setTimeout(() => {
-        loading.value = false;
-    }, 500);
 });
 </script>

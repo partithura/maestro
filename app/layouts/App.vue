@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="isReady">
         <ApplicationUserToolbar />
         <v-breadcrumbs :items="items">
             <template #prepend>
@@ -16,8 +16,29 @@
 </template>
 
 <script setup>
+//colocar sistema de alertas e carregamento de configurações aqui
 const navigationStore = useNavigationStore();
-// const userStore = useUserStore()
+const userStore = useUserStore();
+const cardStore = useCardStore();
+const configStore = useConfigStore();
+const logStore = useLogStore();
+const projectStore = useProjectStore();
+
+const hasData = ref(false);
+
+onMounted(async () => {
+    await Promise.all([
+        configStore.fetchConfig(),
+        logStore.fetchChangeLog(),
+        cardStore.fetchCards(),
+        projectStore.fetchProjects(),
+    ]);
+    hasData.value = true;
+});
+
+const isReady = computed(() => {
+    return Boolean(userStore.getUser?.id) && hasData.value;
+});
 
 const items = computed(() => {
     return navigationStore.getBreadcrumbs;
