@@ -23,7 +23,10 @@
                                     pull: true,
                                     put: true,
                                 }"
-                                class="d-flex project-card-deck">
+                                class="d-flex project-card-deck"
+                                @update="saveCards()"
+                                @add="saveCards()"
+                                @remove="saveCards()">
                                 <div
                                     v-for="card in projectCards"
                                     :key="card.value"
@@ -86,14 +89,6 @@
                                 card-color="#5599FC"
                                 card-selected="+"
                                 @card-unselected="showAddCardDialog" />
-                        </div>
-                        <div class="d-flex mt-3">
-                            <v-btn
-                                prepend-icon="mdi-check"
-                                text="Salvar"
-                                :disabled="loading"
-                                :loading="loading"
-                                @click="saveCards" />
                         </div>
                     </v-sheet>
                 </v-col>
@@ -170,6 +165,7 @@ function removeFromCache(card) {
             return c.value != card.value;
         })
     );
+    saveCards();
 }
 
 function showAddCardDialog() {

@@ -44,10 +44,11 @@ export const useCardStore = defineStore("cardStore", {
                 this.cards = response;
             } catch (error) {
                 logStore.createAlert({
-                    text: error,
+                    text: error.data?.message || "Ocorreu um erro inesperado.",
                     title: "Erro obtendo cartas:",
                     icon: "mdi-cards",
                 });
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -63,10 +64,11 @@ export const useCardStore = defineStore("cardStore", {
                 this.cards = response;
             } catch (error) {
                 logStore.createAlert({
-                    text: error,
+                    text: error.data?.message || "Ocorreu um erro inesperado.",
                     title: "Erro adicionando cartas:",
                     icon: "mdi-cards",
                 });
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -82,10 +84,11 @@ export const useCardStore = defineStore("cardStore", {
                 this.cards = response;
             } catch (error) {
                 logStore.createAlert({
-                    text: error,
+                    text: error.data?.message || "Ocorreu um erro inesperado.",
                     title: "Erro editando cartas:",
                     icon: "mdi-cards",
                 });
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -101,10 +104,11 @@ export const useCardStore = defineStore("cardStore", {
                 this.cards = response;
             } catch (error) {
                 logStore.createAlert({
-                    text: error,
+                    text: error.data?.message || "Ocorreu um erro inesperado.",
                     title: "Erro excluindo cartas:",
                     icon: "mdi-cards",
                 });
+                throw error;
             } finally {
                 this.loading = false;
             }

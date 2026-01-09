@@ -22,6 +22,8 @@
                                     <v-text-field
                                         v-model="card.value"
                                         :disabled="isEditing"
+                                        :rules="[isRequired]"
+                                        autofocus
                                         label="Valor" />
                                 </v-col>
                                 <v-col cols="6">
@@ -72,7 +74,7 @@
                     text="Salvar"
                     variant="outlined"
                     color="success"
-                    :disabled="loading"
+                    :disabled="loading || !isValid"
                     :loading="loading"
                     @click="saveCard()" />
             </template>
@@ -117,14 +119,16 @@ function clearContent() {
 }
 
 function saveCard() {
-    if (isEditing.value) {
-        cardStore.editCard(card.value).finally(() => {
-            clearContent();
-        });
-    } else {
-        cardStore.addNewCard(card.value).finally(() => {
-            clearContent();
-        });
+    if (isValid.value) {
+        if (isEditing.value) {
+            cardStore.editCard(card.value).then(() => {
+                clearContent();
+            });
+        } else {
+            cardStore.addNewCard(card.value).then(() => {
+                clearContent();
+            });
+        }
     }
 }
 
