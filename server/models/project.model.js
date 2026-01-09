@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const projectSchema = new mongoose.Schema({
     number: { type: Number, required: true },
     name: { type: String, required: true, default: "" },
-    query: { type: String, required: true },
+    query: { type: String },
     isActive: { type: Boolean, default: false },
     config: {
         cardDeck: [{ type: mongoose.Schema.Types.ObjectId, ref: "Card" }],
