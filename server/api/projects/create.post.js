@@ -9,18 +9,8 @@ export default defineEventHandler(async (event) => {
         const newProject = new Project({
             number: body.number,
             query: body.query,
-            name: body.name,
-            isActive: body.isActive,
-            config: body.config,
+            name: body.name
         });
-        if (body.isActive) {
-            await Project.updateMany(
-                {},
-                {
-                    $set: { isActive: false },
-                }
-            );
-        }
         const response = await newProject.save();
         return response;
     } catch (error) {

@@ -46,8 +46,25 @@
                         <div class="px-4 py-2">{{ project.name }}</div>
                     </v-btn>
                 </v-col>
+                <v-col
+                    cols="12"
+                    md="6"
+                    lg="4"
+                    xl="3"
+                    xxl="2">
+                    <v-btn
+                        @click="showNewProjectDialog"
+                        height="120px"
+                        block
+                        size="x-large">
+                        <div class="px-4 py-2">Adicionar Projeto</div>
+                    </v-btn>
+                </v-col>
             </v-row>
         </v-col>
+        <AddProjectDialog 
+            v-model="newProjectModel"
+        />
     </v-row>
 </template>
 <script setup>
@@ -70,6 +87,12 @@ const baseRoute = computed(() => {
 const projects = computed(() => {
     return projectStore.getProjects;
 });
+const newProjectModel = ref(false);
+
+function showNewProjectDialog() {
+    newProjectModel.value = true;
+}
+
 onMounted(() => {
     navigationStore.setBreadcrumbs([
         {

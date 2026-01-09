@@ -78,5 +78,25 @@ export const useProjectStore = defineStore("projectStore", {
         setCardDeck(cards) {
             this.activeProject.config.cardDeck = cards;
         },
+        async addNewProject(project) {
+            const logStore = useLogStore();
+            try {
+                this.loading = true;
+                const response = await $fetch("/api/projects/create", {
+                    method: "POST",
+                    body: project
+                });
+                this.projects.push(response);
+            } catch (error) {
+                logStore.createAlert({
+                    text: error,
+                    title: "Erro ao salvar projeto:",
+                    icon: "mdi-content-save-alert"
+                });
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        }
     },
 });

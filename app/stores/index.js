@@ -3,6 +3,7 @@ const configStore = useConfigStore();
 const issueStore = useIssueStore();
 const logStore = useLogStore();
 const navigationStore = useNavigationStore();
+const projectStore = useProjectStore();
 const userStore = useUserStore();
 
 export default {
@@ -11,5 +12,6 @@ export default {
     issueStore,
     logStore,
     navigationStore,
+    projectStore,
     userStore,
 };
