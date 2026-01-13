@@ -21,7 +21,7 @@ export const useProjectStore = defineStore("projectStore", {
         },
         getProjectAreas: (state) => {
             return state.activeProject.config?.areas;
-        }
+        },
     },
     actions: {
         async fetchProjects() {
@@ -124,11 +124,9 @@ export const useProjectStore = defineStore("projectStore", {
         },
         async updateAreas() {
             const logStore = useLogStore();
-            const mappedAreasIds = this.activeProject.config.areas.map(
-                (a) => {
-                    return a._id;
-                }
-            );
+            const mappedAreasIds = this.activeProject.config.areas.map((a) => {
+                return a._id;
+            });
             try {
                 this.loading = true;
                 const response = await $fetch("/api/projects/update", {
@@ -157,6 +155,25 @@ export const useProjectStore = defineStore("projectStore", {
         },
         setProjectAreas(areas) {
             this.activeProject.config.areas = areas;
-        }
+        },
+        async deleteProject(project) {
+            const logStore = useLogStore();
+            try {
+                this.loading = true;
+                const response = await $fetch("/api/projects/delete", {
+                    method: "DELETE",
+                    body: project,
+                });
+                this.projects = response;
+            } catch (error) {
+                logStore.createAlert({
+                    text: error.data?.message,
+                    title: "Erro excluindo projeto",
+                    icon: "mdi-delete",
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
     },
 });

@@ -8,13 +8,19 @@
         <div
             class="button-container"
             :style="computedStyle">
-            <div
+            <v-tooltip
                 v-if="isManagement"
-                class="button-delete">
-                <v-icon
-                    icon="mdi-delete"
-                    @click="handleDelete()" />
-            </div>
+                location="bottom center"
+                :text="deleteTooltip">
+                <template #activator="act">
+                    <div
+                        v-bind="act.props"
+                        class="button-delete"
+                        @click="handleDelete()">
+                        <v-icon icon="mdi-delete" />
+                    </div>
+                </template>
+            </v-tooltip>
             <div
                 class="button-action"
                 :class="isManagement ? 'half-width' : 'full-width'"
@@ -39,6 +45,10 @@ const props = defineProps({
     deleteIcon: {
         type: String,
         default: "mdi-delete",
+    },
+    deleteTooltip: {
+        type: String,
+        default: "Excluir",
     },
     path: {
         type: String,

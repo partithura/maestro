@@ -28,22 +28,11 @@
             <v-row
                 justify="center"
                 align="center">
-                <v-col
+                <ItemButtom
                     v-for="organization in organizations"
                     :key="organization.id"
-                    cols="12"
-                    md="6"
-                    lg="4"
-                    xl="3"
-                    xxl="2">
-                    <v-btn
-                        :to="`/${organization.id}`"
-                        height="120px"
-                        block
-                        size="x-large">
-                        <div class="px-4 py-2">{{ organization.name }}</div>
-                    </v-btn>
-                </v-col>
+                    :path="`/${organization.id}`"
+                    :text="organization.name" />
                 <NewItemButton
                     tooltip="Adicionar nova organização"
                     @click="showNewOrganizationDialog" />
