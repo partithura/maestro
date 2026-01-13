@@ -142,7 +142,7 @@ export const useProjectStore = defineStore("projectStore", {
                 this.activeProject = response;
                 this.projects.find((p) => {
                     return p.number == this.activeProject.number;
-                }).config.area = response?.config?.cardDeck;
+                }).config.areas = response?.config?.areas;
             } catch (error) {
                 logStore.createAlert({
                     text: error.data?.message,

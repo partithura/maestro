@@ -1,4 +1,4 @@
-    import { defineStore } from "pinia";
+import { defineStore } from "pinia";
 
 export const useAreaStore = defineStore("areaStore", {
     state: () => ({
@@ -76,11 +76,11 @@ export const useAreaStore = defineStore("areaStore", {
             }
         },
         async editArea(area) {
-                        const logStore = useLogStore();
+            const logStore = useLogStore();
             try {
                 this.loading = true;
                 const response = await $fetch("/api/effort/areas/update", {
-                    method: "patch",
+                    method: "PATCH",
                     body: area 
                 })
                 this.areas = response;

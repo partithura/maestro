@@ -7,26 +7,24 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
   try {
-    const exists = await EffortArea.exists({ text: body.text });
-    if (!exists) {
+    const updated = await EffortArea.findOneAndUpdate(
+      { _id: body._id },
+      {
+        text: body.text,
+        value: body.value,
+        repository: body.repository,
+      }
+    );
+
+    if (!updated) {
       throw createError({
         statusCode: 404,
         message: "Área não encontrada",
       });
-    } else {
-      await EffortArea.findOneAndUpdate(
-        {
-          text: body.text,
-        },
-        {
-          value: body.value,
-          repository: body.repository,
-        }
-      );
-      const response = await EffortArea.find();
-    
-      return response;
     }
+
+    const response = await EffortArea.find();  
+    return response;
   } catch (error) {
     throw createError({
       statusCode: 500,
