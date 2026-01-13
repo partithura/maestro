@@ -107,14 +107,16 @@
 <script setup>
 definePageMeta({
     layout: "app",
-    name: "Cartas",
+    name: "cards",
+    pageName: "Baralho",
 });
 const navigationStore = useNavigationStore();
 const cardStore = useCardStore();
 const projectStore = useProjectStore();
+const organizationStore = useOrganizationStore();
 const route = useRoute();
 const previousRoute = computed(() => {
-    return `/configuration/${organizationId.value}/${projectId.value}`;
+    return `/${organizationId.value}/${projectId.value}/configuration`;
 });
 const organizationId = computed(() => {
     return route.params.organizationId;
@@ -123,10 +125,10 @@ const projectId = computed(() => {
     return route.params.projectId;
 });
 const organizationName = computed(() => {
-    return "Partithura";
+    return organizationStore.getActiveOrganization.name;
 });
 const projectName = computed(() => {
-    return "Partithura/26";
+    return projectStore.getActiveProject.name;
 });
 
 const organizationCards = computed({
@@ -191,30 +193,32 @@ function saveCards() {
 onMounted(() => {
     navigationStore.setBreadcrumbs([
         {
-            title: `Configurações`,
-            disabled: false,
-            to: `/configuration`,
-        },
-        {
             title: `${organizationName.value}`,
             disabled: false,
-            to: `/configuration/${organizationId.value}`,
+            to: `/${organizationId.value}`,
         },
         {
             title: `${projectName.value}`,
             disabled: false,
-            to: `/configuration/${organizationId.value}/${projectId.value}`,
+            to: `/${organizationId.value}/${projectId.value}`,
         },
         {
-            title: `Cartas`,
+            title: `Configurações do projeto`,
+            disabled: false,
+            to: `/${organizationId.value}/${projectId.value}/configuration`,
+        },
+        {
+            title: `Baralho`,
             disabled: true,
-            to: `/configuration/${organizationId.value}/${projectId.value}/cards`,
+            to: `/${organizationId.value}/${projectId.value}/configuration/cards`,
         },
     ]);
 });
 onBeforeMount(() => {
     projectStore.fetchProjects();
     projectStore.setActiveProject(route.params.projectId);
+    organizationStore.fetchOrganizations();
+    organizationStore.setActiveOrganization(route.params.organizationId);
 });
 </script>
 <style lang="scss" scoped>

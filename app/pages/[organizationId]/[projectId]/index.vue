@@ -19,6 +19,7 @@
             v-else
             cols="12">
             <v-row
+                dense
                 justify="center"
                 align="center">
                 <v-col

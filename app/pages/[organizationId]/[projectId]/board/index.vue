@@ -5,7 +5,9 @@
             <v-row
                 justify="center"
                 align="center">
-                Board do projeto
+                <!-- Criar um layout que atenda aos requisitos de 
+                 um Product Owner, Tech Lead e Scrum Master, 
+                 além de atneder as necessidades do time de devs -->
             </v-row>
         </v-col>
     </v-row>

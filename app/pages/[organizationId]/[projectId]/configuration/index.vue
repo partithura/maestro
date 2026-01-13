@@ -1,6 +1,6 @@
 <template>
     <v-row>
-        <DefaultHeader :to="previousRoute" />
+        <DefaultHeader :to="baseRoute" />
         <v-col cols="12">
             <v-row
                 dense
@@ -13,7 +13,7 @@
                     xl="3"
                     xxl="2">
                     <v-btn
-                        :to="`${baseRoute}/cards`"
+                        :to="`${configRoute}/cards`"
                         height="120px"
                         block
                         size="x-large">
@@ -27,7 +27,7 @@
                     xl="3"
                     xxl="2">
                     <v-btn
-                        :to="`${baseRoute}/modules`"
+                        :to="`${configRoute}/modules`"
                         height="120px"
                         block
                         size="x-large">
@@ -41,7 +41,7 @@
                     xl="3"
                     xxl="2">
                     <v-btn
-                        :to="`${baseRoute}/areas`"
+                        :to="`${configRoute}/areas`"
                         height="120px"
                         block
                         size="x-large">
@@ -55,51 +55,58 @@
 <script setup>
 definePageMeta({
     layout: "app",
-    name: "projects",
-    pageName: "Projetos",
+    name: "",
+    pageName: "Configurações do projeto",
 });
+const route = useRoute();
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();
-const route = useRoute();
-const previousRoute = computed(() => {
-    return `/configuration/${organizationId.value}`;
-});
+const organizationStore = useOrganizationStore();
+
 const baseRoute = computed(() => {
-    return `${previousRoute.value}/${projectId.value}`;
+    return `/${organizationId.value}/${projectId.value}`;
+});
+const configRoute = computed(() => {
+    return `/${organizationId.value}/${projectId.value}/configuration`;
 });
 const organizationId = computed(() => {
     return route.params.organizationId;
 });
+
 const organizationName = computed(() => {
-    return "Partithura";
+    return organizationStore.getActiveOrganization.name;
+});
+
+const projectName = computed(() => {
+    return projectStore.getActiveProject.name;
 });
 const projectId = computed(() => {
     return route.params.projectId;
 });
-const projectName = computed(() => {
-    return "Partithura/26";
-});
+
 onMounted(() => {
     navigationStore.setBreadcrumbs([
         {
-            title: `Configurações`,
-            disabled: false,
-            to: `/configuration`,
-        },
-        {
             title: `${organizationName.value}`,
             disabled: false,
-            to: `/configuration/${organizationId.value}`,
+            to: `/${organizationId.value}`,
         },
         {
             title: `${projectName.value}`,
+            disabled: false,
+            to: `/${organizationId.value}/${projectId.value}`,
+        },
+        {
+            title: `Configurações do projeto`,
             disabled: true,
-            to: `/configuration/${organizationId.value}/${projectId.value}`,
+            to: `/${organizationId.value}/${projectId.value}/configuration`,
         },
     ]);
 });
 onBeforeMount(() => {
     projectStore.fetchProjects();
     projectStore.setActiveProject(route.params.projectId);
+    organizationStore.fetchOrganizations();
+    organizationStore.setActiveOrganization(route.params.organizationId);
 });
 </script>

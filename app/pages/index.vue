@@ -5,6 +5,7 @@
             hide-button />
         <v-col cols="12">
             <v-row
+                dense
                 justify="center"
                 align="center">
                 <v-col
@@ -26,6 +27,7 @@
             <hr class="mt-4" />
             <h3>Organizações:</h3>
             <v-row
+                dense
                 justify="center"
                 align="center">
                 <ItemButtom

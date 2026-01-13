@@ -14,13 +14,15 @@
 <script setup>
 definePageMeta({
     layout: "app",
-    name: "Módulos",
+    name: "modules",
+    pageName: "Módulos",
 });
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();
+const organizationStore = useOrganizationStore();
 const route = useRoute();
 const previousRoute = computed(() => {
-    return `/configuration/${organizationId.value}/${projectId.value}`;
+    return `/${organizationId.value}/${projectId.value}/configuration`;
 });
 const organizationId = computed(() => {
     return route.params.organizationId;
@@ -29,37 +31,39 @@ const projectId = computed(() => {
     return route.params.projectId;
 });
 const organizationName = computed(() => {
-    return "Partithura";
+    return organizationStore.getActiveOrganization.name;
 });
 const projectName = computed(() => {
-    return "Partithura/26";
+    return projectStore.getActiveProject.name;
 });
 onMounted(() => {
     navigationStore.setBreadcrumbs([
         {
-            title: `Configurações`,
-            disabled: false,
-            to: `/configuration`,
-        },
-        {
             title: `${organizationName.value}`,
             disabled: false,
-            to: `/configuration/${organizationId.value}`,
+            to: `/${organizationId.value}`,
         },
         {
             title: `${projectName.value}`,
             disabled: false,
-            to: `/configuration/${organizationId.value}/${projectId.value}`,
+            to: `/${organizationId.value}/${projectId.value}`,
+        },
+        {
+            title: `Configurações do projeto`,
+            disabled: false,
+            to: `/${organizationId.value}/${projectId.value}/configuration`,
         },
         {
             title: `Módulos`,
             disabled: true,
-            to: `/configuration/${organizationId.value}/${projectId.value}/modules`,
+            to: `/${organizationId.value}/${projectId.value}/configuration/modules`,
         },
     ]);
 });
 onBeforeMount(() => {
     projectStore.fetchProjects();
     projectStore.setActiveProject(route.params.projectId);
+    organizationStore.fetchOrganizations();
+    organizationStore.setActiveOrganization(route.params.organizationId);
 });
 </script>
