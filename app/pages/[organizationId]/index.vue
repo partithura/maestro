@@ -58,7 +58,11 @@
             </v-row>
         </v-col>
         <AddProjectDialog v-model="newProjectModal" />
-        <ConfirmDialog v-model="deleteProjectModal" />
+        <ConfirmDialog
+            v-model="deleteProjectModal"
+            :text="`Deseja excluir o projeto '${deleteProjectSelected?.name}'?`"
+            @cancel="cancelDeletion()"
+            @confirm="confirmDeletion()" />
     </v-row>
 </template>
 <script setup>
@@ -78,6 +82,7 @@ const organizationId = computed(() => {
 
 const newProjectModal = ref(false);
 const deleteProjectModal = ref(false);
+const deleteProjectSelected = ref();
 
 const isManagement = computed(() => {
     return userStore.getUser?.isManagement;
@@ -100,7 +105,20 @@ function showNewProjectDialog() {
 }
 
 function showDeleteDialog(project) {
-    console.log("project:", project);
+    deleteProjectSelected.value = project;
+    deleteProjectModal.value = true;
+}
+
+function cancelDeletion() {
+    deleteProjectModal.value = false;
+    setTimeout(() => {
+        deleteProjectSelected.value = {};
+    }, 200);
+}
+function confirmDeletion() {
+    projectStore.deleteProject(deleteProjectSelected.value).then(() => {
+        cancelDeletion();
+    });
 }
 
 onMounted(() => {

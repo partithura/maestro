@@ -1,6 +1,7 @@
 <template>
     <v-dialog
         v-model="model"
+        persistent
         max-width="600">
         <v-card
             :loading="loading"
@@ -22,7 +23,7 @@
                     :text="props.confirmText"
                     variant="outlined"
                     color="success"
-                    :disabled="loading || !isValid"
+                    :disabled="loading"
                     :loading="loading"
                     @click="handleConfirm()" />
             </template>
