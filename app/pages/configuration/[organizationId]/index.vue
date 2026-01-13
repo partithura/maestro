@@ -53,24 +53,23 @@
                     xl="3"
                     xxl="2">
                     <v-btn
-                        @click="showNewProjectDialog"
                         height="120px"
                         block
-                        size="x-large">
+                        size="x-large"
+                        @click="showNewProjectDialog">
                         <div class="px-4 py-2">Adicionar Projeto</div>
                     </v-btn>
                 </v-col>
             </v-row>
         </v-col>
-        <AddProjectDialog 
-            v-model="newProjectModel"
-        />
+        <AddProjectDialog v-model="newProjectModel" />
     </v-row>
 </template>
 <script setup>
 definePageMeta({
     layout: "app",
     name: "",
+    pageName: "",
 });
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();

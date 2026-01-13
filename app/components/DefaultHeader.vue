@@ -21,7 +21,7 @@
 <script setup>
 const userStore = useUserStore();
 const route = useRoute();
-const routeName = route.name;
+const routeName = route.meta.pageName;
 const emits = defineEmits(["click:config"]);
 const props = defineProps({
     to: {
