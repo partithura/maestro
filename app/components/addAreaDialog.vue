@@ -1,11 +1,10 @@
 <template>
     <v-dialog
         v-model="model"
-        max-width="600"
-        persistent>
+        max-width="600">
         <v-card
             :loading="loading"
-            title="Adicionar Projeto">
+            :title="isEditing ? 'Editar área' : 'Adicionar área'">
             <template #append>
                 <v-icon
                     icon="mdi-close"
@@ -14,23 +13,23 @@
             <template #text>
                 <v-form v-model="isValid">
                     <v-row dense>
-                        <v-col cols="3">
-                            <v-number-input
-                                v-model="project.number"
-                                control-variant="hidden"
-                                :rules="[isRequired]"
-                                label="Número *" />
-                        </v-col>
-                        <v-col cols="9">
+                        <v-col cols="12">
                             <v-text-field
-                                v-model="project.name"
+                                v-model="area.text"
+                                :disabled="isEditing"
                                 :rules="[isRequired]"
-                                label="Nome *" />
+                                label="nome *" />
                         </v-col>
                         <v-col cols="12">
                             <v-text-field
-                                v-model="project.query"
-                                label="query"
+                                v-model="area.value"
+                                :rules="[isRequired, isValidVariableName]"
+                                label="valor *" />
+                        </v-col>
+                        <v-col cols="12">
+                            <v-text-field
+                                v-model="area.repository"
+                                label="repositório"
                                 hide-details />
                         </v-col>
                     </v-row>
@@ -52,51 +51,64 @@
                     color="success"
                     :disabled="loading || !isValid"
                     :loading="loading"
-                    @click="saveProject()" />
+                    @click="saveArea()" />
             </template>
         </v-card>
     </v-dialog>
 </template>
 
 <script setup>
-const projectStore = useProjectStore();
+const areaStore = useAreaStore();
 const model = defineModel({ type: Boolean });
-const project = ref({
-    number: null,
-    name: null,
-    query: null,
-    config: {
-        cardDeck: [],
-        modules: [],
-        areas: [],
+const emits = defineEmits(["modalClose"]);
+const props = defineProps({
+    initialArea: {
+        type: [Object, null],
+        default: null,
     },
+});
+const isEditing = computed(() => {
+    return Boolean(props.initialArea);
+});
+const area = ref({
+    text: null,
+    value: null,
+    repository: null,
 });
 
 const isValid = ref(false);
 
 const loading = computed(() => {
-    return projectStore.getLoading;
+    return areaStore.getLoading;
 });
 
 function clearContent() {
     model.value = false;
-    project.value = {
-        number: null,
-        name: null,
-        query: null,
-        config: {
-            cardDeck: [],
-            modules: [],
-            areas: [],
-        },
+    area.value = {
+        text: null,
+        value: null,
+        repository: null,
     };
+    emits("modalClose");
 }
 
-async function saveProject() {
-    if (isValid.value) {
-        projectStore.addNewProject(project.value).then(() => {
+async function saveArea() {
+  if (isValid.value) {
+    if (isEditing.value) {
+        areaStore.editArea(area.value).then(() => {
             clearContent();
         });
+    } else {
+        areaStore.addNewArea(area.value).then(() => {
+          clearContent();
+        });
     }
+  }
 }
+watch(model, (value) => {
+    //associar a carta props
+    if (value && props.initialArea?.value) {
+        area.value = Object.assign(area.value, props.initialArea);
+    }
+});
 </script>
