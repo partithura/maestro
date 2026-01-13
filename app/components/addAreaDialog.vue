@@ -17,7 +17,8 @@
                             <v-text-field
                                 v-model="area.text"
                                 :rules="[isRequired]"
-                                label="nome *" />
+                                label="nome *" 
+                                autofocus />
                         </v-col>
                         <v-col cols="12">
                             <v-text-field
