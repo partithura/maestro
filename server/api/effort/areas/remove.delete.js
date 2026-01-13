@@ -8,9 +8,15 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const {value} = body;
   try {
-    await EffortArea.findOneAndDelete({value:value});
-    const response = await EffortArea.find();
+    const deleted = await EffortArea.findOneAndDelete({value:value});
+    if (!deleted) {
+      throw createError({
+        statusCode: 404,
+        message: "Área não encontrada",
+      });
+    }
     
+    const response = await EffortArea.find();
     return response;
   } catch (error) {
     throw createError({
