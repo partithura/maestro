@@ -5,11 +5,10 @@
       <v-row
         dense
         justify="center"
-      >
-        
-        <v-col cols="6">
+      >       
+        <v-col cols="6" sm="12" md="6">
           <h3>Áreas disponíveis:</h3>
-          <v-table class="areas-table">
+          <v-table>
             <thead>
               <tr>
                 <th>Nome</th>
@@ -64,9 +63,9 @@
           </v-table>
         </v-col>
 
-        <v-col cols="6">
+        <v-col cols="6" sm="12" md="6">
           <h3>Áreas incluídas no projeto:</h3>
-          <v-table class="areas-table">
+          <v-table>
             <thead>
               <tr>
                 <th>Nome</th>
@@ -89,17 +88,19 @@
               @add="saveProjectAreas()"
               @remove="saveProjectAreas()"
             >
-               <tr v-if="projectAreas.length === 0" class="drop-placeholder">
+
+              <tr
+                v-if="projectAreas.length === 0"
+                class="drop-placeholder"
+              >
                 <td colspan="4" class="text-center">
                   Arraste áreas para o projeto
                 </td>
               </tr>
+              
               <tr 
                 v-for="area in projectAreas" 
-                v-else
                 :key="area.value"
-                class="clickable-row"
-                @click="editArea(area)"
               >
                 <td>{{ area.text }}</td>
                 <td>{{ area.value }}</td>
@@ -165,8 +166,7 @@ const organizationAreas = computed({
         })
       );
     });
-  },
-  set() {}
+  }
 }); 
 
 const projectAreas = computed({
