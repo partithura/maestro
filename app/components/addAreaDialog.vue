@@ -16,7 +16,6 @@
                         <v-col cols="12">
                             <v-text-field
                                 v-model="area.text"
-                                :disabled="isEditing"
                                 :rules="[isRequired]"
                                 label="nome *" />
                         </v-col>
