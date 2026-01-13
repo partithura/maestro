@@ -14,10 +14,9 @@ export default defineEventHandler(async (event) => {
         text: body.text,
         repository: body.repository,
       });
-      const response = await newEffort.save(); // Salvar a nova issue no banco
-      return response;
+      await newEffort.save(); // Salvar a nova issue no banco
     } else {
-      const response = await EffortArea.findOneAndUpdate(
+      await EffortArea.findOneAndUpdate(
         {
           value: body.value,
         },
@@ -26,8 +25,9 @@ export default defineEventHandler(async (event) => {
           repository: body.repository,
         }
       );
-      return response;
     }
+    const response = await EffortArea.find();
+    return response;
   } catch (error) {
     throw createError({
       statusCode: 500,

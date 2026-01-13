@@ -19,6 +19,9 @@ export const useProjectStore = defineStore("projectStore", {
         getCardDeck: (state) => {
             return state.activeProject.config?.cardDeck;
         },
+        getProjectAreas: (state) => {
+            return state.activeProject.config?.areas;
+        }
     },
     actions: {
         async fetchProjects() {
@@ -101,5 +104,41 @@ export const useProjectStore = defineStore("projectStore", {
                 this.loading = false;
             }
         },
+        async updateAreas() {
+            const logStore = useLogStore();
+            const mappedAreasIds = this.activeProject.config.areas.map(
+                (a) => {
+                    return a._id;
+                }
+            );
+            try {
+                this.loading = true;
+                const response = await $fetch("/api/projects/update", {
+                    method: "POST",
+                    body: {
+                        ...this.activeProject,
+                        config: {
+                            ...this.activeProject.config,
+                            areas: mappedAreasIds,
+                        },
+                    },
+                });
+                this.activeProject = response;
+                this.projects.find((p) => {
+                    return p.number == this.activeProject.number;
+                }).config.area = response?.config?.cardDeck;
+            } catch (error) {
+                logStore.createAlert({
+                    text: error.data?.message,
+                    title: "Erro de atualização",
+                    icon: "mdi-database-alert",
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+        setProjectAreas(areas) {
+            this.activeProject.config.areas = areas;
+        }
     },
 });

@@ -5,6 +5,8 @@ const logStore = useLogStore();
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();
 const userStore = useUserStore();
+const areaStore = useAreaStore();
+const moduleStore = useModuleStore();
 
 export default {
     cardStore,
@@ -14,4 +16,6 @@ export default {
     navigationStore,
     projectStore,
     userStore,
+    areaStore,
+    moduleStore
 };

@@ -8,7 +8,9 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const {value} = body;
   try {
-    const response = await EffortArea.findOneAndDelete({value:value});
+    await EffortArea.findOneAndDelete({value:value});
+    const response = await EffortArea.find();
+    
     return response;
   } catch (error) {
     throw createError({
