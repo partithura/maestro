@@ -15,11 +15,11 @@
                     xl="3"
                     xxl="2">
                     <v-btn
-                        to="/configuration"
+                        to="/globalConfig"
                         height="120px"
                         block
                         size="x-large">
-                        <div class="px-4 py-2">Configurações</div>
+                        <div class="px-4 py-2">Configurações globais</div>
                     </v-btn>
                 </v-col>
             </v-row>
@@ -44,19 +44,25 @@
                         <div class="px-4 py-2">{{ organization.name }}</div>
                     </v-btn>
                 </v-col>
-                <NewItemButton tooltip="Adicionar nova organização" />
+                <NewItemButton
+                    tooltip="Adicionar nova organização"
+                    @click="showNewOrganizationDialog" />
             </v-row>
         </v-col>
+        <AddOrganizationDialog v-model="newOrganizationModal" />
     </v-row>
 </template>
 <script setup>
 definePageMeta({
     layout: "app",
-    name: "Dashboard",
+    name: "dashboard",
+    pageName: "Dashboard",
 });
 const navigationStore = useNavigationStore();
 const userStore = useUserStore();
 const organizationStore = useOrganizationStore();
+
+const newOrganizationModal = ref(false);
 
 const isManagement = computed(() => {
     return userStore.getUser?.isManagement;
@@ -65,6 +71,11 @@ const isManagement = computed(() => {
 const organizations = computed(() => {
     return organizationStore.getOrganizations;
 });
+
+function showNewOrganizationDialog() {
+    newOrganizationModal.value = true;
+}
+
 onMounted(() => {
     navigationStore.setBreadcrumbs([]);
 });

@@ -6,16 +6,15 @@ export default defineEventHandler(async (event) => {
     await mongoose.connect(env.MONGODB_CONNECTION_STRING);
     const body = await readBody(event);
     try {
-        const newOrganization = new Organization({
-            ...body,
+        await Organization.findOneAndDelete({
+            id: body.id,
         });
-        await newOrganization.save();
         const response = await Organization.find({}, { _id: 0, __v: 0 });
         return response;
     } catch (error) {
         throw createError({
             statusCode: 500,
-            message: `Não foi possível executar a operação: ${error.message}`,
+            message: `${error.message}`,
         });
     }
 });

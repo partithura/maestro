@@ -125,7 +125,7 @@ function firstCase(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function parseColor(colorStr = "") {
+function parseColor(colorStr = "", defaultValue = null) {
     // Passo 1: Verificar se é um valor hexadecimal (com ou sem #)
     let hex = colorStr.trim();
 
@@ -152,7 +152,7 @@ function parseColor(colorStr = "") {
     }
 
     // Caso não seja uma cor válida
-    return null;
+    return defaultValue;
 }
 
 function timestampToTime(timestamp) {

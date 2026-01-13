@@ -55,7 +55,8 @@
 <script setup>
 definePageMeta({
     layout: "app",
-    name: "Projetos",
+    name: "projects",
+    pageName: "Projetos",
 });
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();

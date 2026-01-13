@@ -76,10 +76,28 @@ export const useProjectStore = defineStore("projectStore", {
             }
         },
         setActiveProject(pid) {
-            const projectIndex = this.projects.findIndex((p) => {
-                return p.number == pid;
-            });
-            this.activeProject = this.projects[projectIndex];
+            if (pid) {
+                const logStore = useLogStore();
+                const projectIndex = this.projects.findIndex((p) => {
+                    return p.number == pid;
+                });
+                if (projectIndex < 0) {
+                    logStore.createAlert({
+                        text: `O projeto com o número "${pid}" não foi encontrado para essa organização`,
+                        title: "Projeto não encontrado:",
+                        type: "warning",
+                        icon: "mdi-note-alert",
+                    });
+                    this.activeProject = {
+                        name: "404",
+                        number: pid,
+                        error: true,
+                    };
+                    navigateTo("/");
+                } else {
+                    this.activeProject = this.projects[projectIndex];
+                }
+            }
         },
         setCardDeck(cards) {
             this.activeProject.config.cardDeck = cards;
