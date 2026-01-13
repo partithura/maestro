@@ -32,13 +32,22 @@
                     v-for="organization in organizations"
                     :key="organization.id"
                     :path="`/${organization.id}`"
-                    :text="organization.name" />
+                    :text="organization.name" 
+                    @delete="showDeleteOrganizationDialog(organization)"/>
                 <NewItemButton
                     tooltip="Adicionar nova organização"
                     @click="showNewOrganizationDialog" />
             </v-row>
         </v-col>
         <AddOrganizationDialog v-model="newOrganizationModal" />
+        <ConfirmDialog 
+            v-model="deleteOrganizationModal"
+            :text="`Deseja excluir a organização ${deleteOrganizationSelected?.name}?`"
+            confirm-text="excluir"
+            :loading="loading"
+            @confirm="deleteOrganization()"
+            @cancel="closeDeleteOrganizationDialog()"
+        />
     </v-row>
 </template>
 <script setup>
@@ -52,10 +61,17 @@ const userStore = useUserStore();
 const organizationStore = useOrganizationStore();
 
 const newOrganizationModal = ref(false);
+const deleteOrganizationModal = ref(false);
+
+const deleteOrganizationSelected = ref();
 
 const isManagement = computed(() => {
     return userStore.getUser?.isManagement;
 });
+
+const loading = computed(() => {
+    return organizationStore.getLoading;
+})
 
 const organizations = computed(() => {
     return organizationStore.getOrganizations;
@@ -63,6 +79,21 @@ const organizations = computed(() => {
 
 function showNewOrganizationDialog() {
     newOrganizationModal.value = true;
+}
+
+function showDeleteOrganizationDialog(org) {
+    deleteOrganizationSelected.value = org;
+    deleteOrganizationModal.value = true;
+}
+
+function closeDeleteOrganizationDialog() {
+    deleteOrganizationSelected.value = null;
+    deleteOrganizationModal.value = false;
+}
+
+function deleteOrganization() {
+    organizationStore.deleteOrganization(deleteOrganizationSelected.value);
+    deleteOrganizationModal.value = false;
 }
 
 onMounted(() => {
