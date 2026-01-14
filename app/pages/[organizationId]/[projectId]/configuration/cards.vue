@@ -168,21 +168,3 @@ onBeforeMount(() => {
     organizationStore.setActiveOrganization(route.params.organizationId);
 });
 </script>
-<style lang="scss" scoped>
-.project-card-deck {
-    max-width: 100%;
-    min-width: 112px;
-    min-height: 209px;
-    margin-right: 12px;
-    overflow-x: scroll;
-    background-color: #143314;
-}
-.card-deck {
-    max-width: calc(100% - 112px);
-    min-width: 112px;
-    min-height: 209px;
-    margin-right: 12px;
-    overflow-x: scroll;
-    background-color: #333;
-}
-</style>
