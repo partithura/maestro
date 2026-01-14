@@ -9,87 +9,33 @@
                 <v-col>
                     <h2>Baralho:</h2>
                     <v-sheet class="pa-4">
-                        <h3>Cartas incluidas no projeto:</h3>
-                        <v-skeleton-loader
-                            v-if="loading"
-                            height="225px" />
-                        <div
-                            v-else
-                            class="d-flex mb-4">
-                            <VueDraggable
-                                v-model="projectCards"
-                                :group="{
-                                    name: 'cards',
-                                    pull: true,
-                                    put: true,
-                                }"
-                                class="d-flex project-card-deck"
-                                @update="saveCards()"
-                                @add="saveCards()"
-                                @remove="saveCards()">
-                                <div
-                                    v-for="card in projectCards"
-                                    :key="card.value"
-                                    class="mx-3">
-                                    <BigCard
-                                        :card-value="card.value"
-                                        :card-color="card.color"
-                                        :card-tooltip="card.tooltip"
-                                        :card-selected="card.value" />
-                                    <v-btn
-                                        class="my-2"
-                                        variant="flat"
-                                        density="compact"
-                                        color="grey-darken-3"
-                                        block
-                                        icon="mdi-arrow-down"
-                                        @click="removeFromCache(card)" />
-                                </div>
-                            </VueDraggable>
-                        </div>
-                        <h3>Cartas disponíveis:</h3>
-                        <v-skeleton-loader
-                            v-if="loading"
-                            height="213px" />
-                        <div
-                            v-else
-                            class="d-flex mb-4">
-                            <VueDraggable
-                                v-model="organizationCards"
-                                :sort="false"
-                                :group="{
-                                    name: 'cards',
-                                    pull: true,
-                                    put: true,
-                                }"
-                                class="d-flex card-deck">
-                                <div
-                                    v-for="card in organizationCards"
-                                    :key="card.value"
-                                    class="mx-3">
-                                    <BigCard
-                                        :card-value="card.value"
-                                        :card-color="card.color"
-                                        :card-tooltip="card.tooltip"
-                                        :card-selected="card.value"
-                                        @card-unselected="editCard(card)" />
-                                    <v-btn
-                                        class="my-2"
-                                        variant="flat"
-                                        density="compact"
-                                        color="grey-darken-3"
-                                        block
-                                        icon="mdi-delete"
-                                        @click="showRemoveCardDialog(card)" />
-                                </div>
-                            </VueDraggable>
-                            <BigCard
+                        <DraggableCardDeck
+                            v-model="projectCards"
+                            title="Cartas incluidas no projeto:"
+                            :loading="loading"
+                            action-icon="mdi-arrow-down"
+                            deck-class="project-card-deck"
+                            @action-click="removeFromCache"
+                            @drag-change="saveCards" />
+                      
+                        <DraggableCardDeck 
+                            v-model="organizationCards"
+                            title="Cartas disponíveis:"
+                            :loading="loading"
+                            :sort="false"
+                            clickable-card
+                            deck-class="card-deck"
+                            @action-click="showRemoveCardDialog"
+                            @card-click="editCard">
+                            <template #append>
+                                <BigCard
                                 card-value="+"
                                 card-tooltip="Criar nova carta"
                                 card-color="#5599FC"
                                 card-selected="+"
                                 @card-unselected="showAddCardDialog" />
-                        </div>
+                            </template>
+                        </DraggableCardDeck>   
                     </v-sheet>
                 </v-col>
             </v-row>
@@ -141,16 +87,17 @@ const organizationCards = computed({
             );
         });
     },
+    set() {}
 });
 
 const newCardModal = ref(false);
 const deleteCardModal = ref(false);
 const selectedCard = ref(null);
 
-const loading = ref(false);
-// const loading = computed(() => {
-//     return cardStore.getLoading || projectStore.getLoading;
-// });
+
+const loading = computed(() => {
+    return cardStore.getLoading || projectStore.getLoading;
+});
 
 const projectCards = computed({
     get() {
@@ -221,21 +168,3 @@ onBeforeMount(() => {
     organizationStore.setActiveOrganization(route.params.organizationId);
 });
 </script>
-<style lang="scss" scoped>
-.project-card-deck {
-    max-width: 100%;
-    min-width: 112px;
-    min-height: 209px;
-    margin-right: 12px;
-    overflow-x: scroll;
-    background-color: #143314;
-}
-.card-deck {
-    max-width: calc(100% - 112px);
-    min-width: 112px;
-    min-height: 209px;
-    margin-right: 12px;
-    overflow-x: scroll;
-    background-color: #333;
-}
-</style>

@@ -2,7 +2,13 @@
     <div
         class="card-container"
         :class="{ selected: isSelected, disabled: props.disabled }"
-        :style="isSelected ? `background-color: ${cardColor};` : ''"
+        :style="{
+            backgroundColor: props.loading
+                ? '#4b4b4b'
+                : isSelected
+                ? cardColor
+                : '#ffffff'
+            }"
         @click="switchCard">
         <div class="mini-card">
             <div>
@@ -32,6 +38,10 @@ const props = defineProps({
         default: "#FFFFFF",
     },
     disabled: {
+        type: Boolean,
+        default: false,
+    },
+    loading: {
         type: Boolean,
         default: false,
     },
@@ -107,5 +117,6 @@ $innerCardBorderWidth: calc($cardOffset / 2);
 
 .selected {
     transform: scaleX(1) scaleY(1);
+    background-color: v-bind(cardColor);
 }
 </style>
