@@ -21,7 +21,7 @@
                         :card-color="card.color"
                         :card-tooltip="card.tooltip"
                         :card-selected="card.value" 
-                        @card-unselected="handCardClick(card)" />
+                        @card-unselected="handleCardClick(card)" />
                     <v-btn
                         class="my-2"
                         variant="flat"
@@ -41,7 +41,7 @@
 const props = defineProps({
   modelValue: {
     type: Array,
-    default: () => {[]}
+    default: () => []
   },
   title: {
     type: String,
@@ -88,7 +88,7 @@ const internalCards = computed({
   set: (v) => emit("update:modelValue", v)
 })
 
-function handCardClick(card) {
+function handleCardClick(card) {
   if (!props.clickableCard) return;
   emit("card-click", card);
 }
