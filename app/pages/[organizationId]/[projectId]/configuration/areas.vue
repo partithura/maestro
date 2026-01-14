@@ -5,112 +5,42 @@
             <v-row
                 dense
                 justify="center">
-                <v-col cols="6">
-                    <h3>Cartas disponíveis:</h3>
-                    <v-table class="areas-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Valor</th>
-                                <th>Repositório</th>
-                                <th class="text-right">ações</th>
-                            </tr>
-                        </thead>
-
-                        <VueDraggable
-                            v-model="organizationAreas"
-                            :group="{
-                                name: 'areas',
-                                pull: true,
-                                put: true,
-                            }"
-                            item-key="value"
-                            tag="tbody">
-                            <tr
-                                v-for="area in organizationAreas"
-                                :key="area.value"
-                                class="clickable-row"
-                                @click="editArea(area)">
-                                <td>{{ area.text }}</td>
-                                <td>{{ area.value }}</td>
-                                <td>{{ area.repository }}</td>
-                                <td class="text-right">
-                                    <v-btn
-                                        icon="mdi-delete"
-                                        variant="text"
-                                        @click.stop="showDeleteModal(area)" />
-                                </td>
-                            </tr>
-                        </VueDraggable>
-                        <tfoot>
-                            <tr>
-                                <td
-                                    colspan="4"
-                                    class="text-center">
-                                    <v-btn
-                                        prepend-icon="mdi-plus"
-                                        variant="text"
-                                        color="primary"
-                                        @click="showAddModal">
-                                        Adicionar área
-                                    </v-btn>
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </v-table>
+                <v-col cols="12" md="6">
+                    <AreasTable
+                        v-model="organizationAreas"
+                        title="Áreas disponíveis:"
+                        clickable-rows
+                        @row-click="editArea"
+                        @action-click="showDeleteModal"
+                    >
+                        <template #footer>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <v-btn
+                                            prepend-icon="mdi-plus"
+                                            variant="text"
+                                            color="primary"
+                                            @click="showAddModal"
+                                        >
+                                            Adicionar área
+                                        </v-btn>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </template>
+                    </AreasTable>
                 </v-col>
 
-                <v-col cols="6">
-                    <h3>Áreas incluídas no projeto:</h3>
-                    <v-table class="areas-table">
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>Valor</th>
-                                <th>Repositório</th>
-                                <th class="text-right">ações</th>
-                            </tr>
-                        </thead>
-
-                        <VueDraggable
-                            v-model="projectAreas"
-                            :group="{
-                                name: 'areas',
-                                pull: true,
-                                put: true,
-                            }"
-                            item-key="value"
-                            tag="tbody"
-                            @update="saveProjectAreas()"
-                            @add="saveProjectAreas()"
-                            @remove="saveProjectAreas()">
-                            <tr
-                                v-if="projectAreas.length === 0"
-                                class="drop-placeholder">
-                                <td
-                                    colspan="4"
-                                    class="text-center">
-                                    Arraste áreas para o projeto
-                                </td>
-                            </tr>
-                            <tr
-                                v-for="area in projectAreas"
-                                v-else
-                                :key="area.value"
-                                class="clickable-row"
-                                @click="editArea(area)">
-                                <td>{{ area.text }}</td>
-                                <td>{{ area.value }}</td>
-                                <td>{{ area.repository }}</td>
-                                <td class="text-right">
-                                    <v-btn
-                                        icon="mdi-arrow-left"
-                                        variant="text"
-                                        @click.stop="removeFromCache(area)" />
-                                </td>
-                            </tr>
-                        </VueDraggable>
-                    </v-table>
+                <v-col cols="12" md="6">
+                    <AreasTable
+                        v-model="projectAreas"
+                        title="Áreas incluídas no projeto:"
+                        action-icon="mdi-arrow-left"
+                        show-placeholder
+                        @action-click="removeFromCache"
+                        @drag-change="saveProjectAreas"
+                    />
                 </v-col>
             </v-row>
         </v-col>
@@ -240,27 +170,3 @@ onBeforeMount(() => {
 });
 </script>
 
-<style scoped>
-/* :deep(.v-table__wrapper table thead tr th),
-:deep(.v-table__wrapper table tbody tr td) {
-  padding: 12px 100px;
-} */
-:deep(.v-table thead tr th) {
-    background-color: #3a3a3a;
-    font-size: 1rem;
-}
-
-.clickable-row {
-    cursor: pointer;
-}
-
-.clickable-row:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-.drop-placeholder {
-    height: 64px;
-    color: #777;
-    font-style: italic;
-}
-</style>
