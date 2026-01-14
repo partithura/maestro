@@ -8,6 +8,7 @@
                 :group="group"
                 :sort="sort"
                 :class="['d-flex', deckClass]"
+                :animation="200"
                 @update="emitChange"
                 @add="emitChange"
                 @remove="emitChange">
