@@ -65,7 +65,7 @@ const organizationStore = useOrganizationStore();
 const areaStore = useAreaStore();
 const route = useRoute();
 const previousRoute = computed(() => {
-    return `/configuration/${organizationId.value}/${projectId.value}`;
+    return `/${organizationId.value}/${projectId.value}/configuration`;
 });
 
 const organizationId = computed(() => {

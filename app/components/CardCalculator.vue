@@ -19,52 +19,13 @@
                 </template>
             </v-toolbar>
             <v-card-text class="d-flex align-center justify-center">
-                <table>
-                    <tbody>
-                        <tr>
-                            <th class="last-header" />
-                            <th
-                                v-for="header in headers"
-                                :key="header.value">
-                                {{ header.text }}
-                            </th>
-                            <th class="last-header">Voto</th>
-                        </tr>
-                        <tr
-                            v-for="(item, index) in items"
-                            :key="`row_${item.value}`">
-                            <td>{{ item.text }}</td>
-                            <td
-                                v-for="header in headers"
-                                :key="`${item.text}_${header.text}_${index}`">
-                                <v-select
-                                    v-model="
-                                        selections[header.value][item.value]
-                                    "
-                                    v-bind="props"
-                                    density="compact"
-                                    hide-details
-                                    :items="header.points"
-                                    item-value="value"
-                                    item-title="text"
-                                    @update:model-value="
-                                        updateTotal(header.value)
-                                    " />
-                            </td>
-                            <td class="last-header" />
-                        </tr>
-                        <tr>
-                            <td class="last-header">TOTAL:</td>
-                            <td
-                                v-for="header in headers"
-                                :key="`soma_${header.text}`"
-                                class="last-header">
-                                {{ selections[header.value].total }}
-                            </td>
-                            <td class="last-header">{{ total }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <CalculatorTable 
+                    :headers="headers"
+                    :items="items"
+                    :selections="selections"
+                    :total="total"
+                    @update="updateTotal"
+                />
             </v-card-text>
             <div class="text-center pb-4">
                 {{ tooltip }}
@@ -90,6 +51,7 @@
 import { nextTick, ref } from "vue";
 
 const configStore = useConfigStore();
+const areaStore = useAreaStore();
 const cardStore = useCardStore();
 
 const props = defineProps({
@@ -103,12 +65,12 @@ const headers = computed(() => {
     return configStore.getModulesConfig;
 });
 const items = computed(() => {
-    return configStore.getAreasConfig;
+    return areaStore.getAreasConfig;
 });
 
 const effort = computed(() => {
     return cardStore.getCards.filter((c) => {
-        return typeof c.value == "number";
+        return !isNaN(Number(c.value));
     });
 });
 
@@ -188,19 +150,3 @@ function findClosestValue(numero) {
     return ordenado[ordenado.length - 1];
 }
 </script>
-<style lang="scss" scoped>
-td,
-th {
-    text-align: center;
-    max-width: 160px;
-    min-width: 100px;
-    padding: 8px;
-    background-color: rgb(49, 49, 49);
-}
-table {
-    background-color: rgb(20, 20, 20);
-}
-.last-header {
-    background-color: rgb(27, 27, 27);
-}
-</style>
