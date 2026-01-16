@@ -134,7 +134,7 @@ export const useOrganizationStore = defineStore("organizationStore", {
                 this.loading = false;
             }
         },
-        async setOrganizationConfig({ token }) {
+        async setOrganizationToken({ token }) {
             const logStore = useLogStore();
 
             try {
@@ -147,6 +147,42 @@ export const useOrganizationStore = defineStore("organizationStore", {
                     body: {
                         id: this.activeOrganization.id,
                         organizationToken: token,
+                    },
+                });
+                this.fetchOrganizations().then(() => {
+                    this.setActiveOrganization(response.id);
+                });
+            } catch (error) {
+                logStore.createAlert({
+                    text: error.data?.message,
+                    title: "Erro de carregamento",
+                    icon: "mdi-database-alert",
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+        async setOrganizationVisualizations() {
+            const logStore = useLogStore();
+            const projectStore = useProjectStore();
+            const githubToken = useCookie("token").value;
+            try {
+                this.loading = true;
+                const projectHiddenIds = projectStore.getProjects
+                    .filter((p) => {
+                        return p.global_hidden;
+                    })
+                    .map((p) => {
+                        return p.id;
+                    });
+                const response = await $fetch("/api/organizations/update", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${githubToken}`,
+                    },
+                    body: {
+                        id: this.activeOrganization.id,
+                        hidden_projects: projectHiddenIds,
                     },
                 });
                 this.fetchOrganizations().then(() => {

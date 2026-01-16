@@ -17,10 +17,10 @@ export const useProjectStore = defineStore("projectStore", {
             return state.activeProject;
         },
         getCardDeck: (state) => {
-            return state.activeProject.config?.cardDeck;
+            return state.activeProject?.config?.cardDeck;
         },
         getProjectAreas: (state) => {
-            return state.activeProject.config?.areas;
+            return state.activeProject?.config?.areas;
         },
     },
     actions: {

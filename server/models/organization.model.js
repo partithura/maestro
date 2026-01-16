@@ -8,6 +8,7 @@ const organizationSchema = new mongoose.Schema({
     id: { type: String },
     avatarUrl: { type: String },
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
+    hidden_projects: [],
     organizationToken: { type: String },
 });
 

@@ -9,14 +9,13 @@
                 justify="center"
                 align="center">
                 <v-col
-                    v-if="isManagement"
                     cols="12"
                     md="6"
                     lg="4"
                     xl="3"
                     xxl="2">
                     <v-btn
-                        to="/globalConfig"
+                        to="/userConfig"
                         height="120px"
                         block
                         size="x-large">
@@ -49,13 +48,6 @@
                 <ItemLoader v-if="loading && organizations.length <= 0" />
             </v-row>
         </v-col>
-        <ConfirmDialog
-            v-model="deleteOrganizationModal"
-            :text="`Deseja excluir a organização ${deleteOrganizationSelected?.name}?`"
-            confirm-text="excluir"
-            :loading="loading"
-            @confirm="deleteOrganization()"
-            @cancel="closeDeleteOrganizationDialog()" />
     </v-row>
 </template>
 <script setup>
@@ -80,14 +72,19 @@ const loading = computed(() => {
     return organizationStore.getLoading;
 });
 
-const organizations = computed(() => {
-    return organizationStore.getOrganizations;
+const userHiddenOrgs = computed(() => {
+    return userStore.getUser?.prefs?.hidden_organizations;
 });
 
-function showDeleteOrganizationDialog(org) {
-    deleteOrganizationSelected.value = org;
-    deleteOrganizationModal.value = true;
-}
+const organizations = computed(() => {
+    return organizationStore.getOrganizations.filter((org) => {
+        return Boolean(
+            !userHiddenOrgs.value.find((i) => {
+                return i == org.id;
+            })
+        );
+    });
+});
 
 function closeDeleteOrganizationDialog() {
     deleteOrganizationSelected.value = null;

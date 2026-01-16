@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
             { id: body.id },
             {
                 organizationToken: body.organizationToken,
+                hidden_projects: body.hidden_projects,
             }
         );
         const response = await Organization.find(

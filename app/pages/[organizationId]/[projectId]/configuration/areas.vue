@@ -7,24 +7,26 @@
             <v-row
                 dense
                 justify="center">
-                <v-col cols="12" md="6">
+                <v-col
+                    cols="12"
+                    md="6">
                     <AreasTable
                         v-model="organizationAreas"
                         title="Áreas disponíveis:"
                         clickable-rows
                         @row-click="editArea"
-                        @action-click="showDeleteModal"
-                    >
+                        @action-click="showDeleteModal">
                         <template #footer>
                             <tfoot>
                                 <tr>
-                                    <td colspan="4" class="text-center">
+                                    <td
+                                        colspan="4"
+                                        class="text-center">
                                         <v-btn
                                             prepend-icon="mdi-plus"
                                             variant="text"
                                             color="primary"
-                                            @click="showAddModal"
-                                        >
+                                            @click="showAddModal">
                                             Adicionar área
                                         </v-btn>
                                     </td>
@@ -34,15 +36,16 @@
                     </AreasTable>
                 </v-col>
 
-                <v-col cols="12" md="6">
+                <v-col
+                    cols="12"
+                    md="6">
                     <AreasTable
                         v-model="projectAreas"
                         title="Áreas incluídas no projeto:"
                         action-icon="mdi-arrow-left"
                         show-placeholder
                         @action-click="removeFromCache"
-                        @drag-change="saveProjectAreas"
-                    />
+                        @drag-change="saveProjectAreas" />
                 </v-col>
             </v-row>
         </v-col>
@@ -59,7 +62,8 @@
 <script setup>
 definePageMeta({
     layout: "app",
-    name: "Áreas",
+    name: "",
+    pageName: "Áreas",
 });
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();
@@ -69,7 +73,7 @@ const logStore = useLogStore();
 const areaStore = useAreaStore();
 const route = useRoute();
 const previousRoute = computed(() => {
-    return `/configuration/${organizationId.value}/${projectId.value}`;
+    return `/${organizationId.value}/${projectId.value}/configuration`;
 });
 
 const organizationId = computed(() => {
@@ -97,7 +101,7 @@ const organizationAreas = computed({
             );
         });
     },
-    set() {}
+    set() {},
 });
 
 const projectAreas = computed({
@@ -185,4 +189,3 @@ onBeforeMount(() => {
     }
 });
 </script>
-

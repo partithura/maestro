@@ -22,7 +22,6 @@
                 justify="center"
                 align="center">
                 <v-col
-                    v-if="isManagement"
                     cols="12"
                     md="6"
                     lg="4"
@@ -125,8 +124,27 @@ const organizationError = computed(() => {
 const baseRoute = computed(() => {
     return `${organizationId.value}`;
 });
+const userHiddenProjects = computed(() => {
+    return userStore.getUser?.prefs?.hidden_projects;
+});
+const organizationHiddenProjects = computed(() => {
+    return organizationStore.getActiveOrganization?.hidden_projects;
+});
 const projects = computed(() => {
-    return projectStore.getProjects;
+    return projectStore.getProjects.filter((p) => {
+        return (
+            Boolean(
+                !userHiddenProjects.value.find((i) => {
+                    return i == p.id;
+                })
+            ) &&
+            Boolean(
+                !organizationHiddenProjects.value.find((i) => {
+                    return i == p.id;
+                })
+            )
+        );
+    });
 });
 
 const loading = computed(() => {

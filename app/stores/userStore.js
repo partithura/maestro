@@ -17,6 +17,12 @@ export const useUserStore = defineStore("userStore", {
         setUser(v) {
             this.user = v;
         },
+        setUserPrefs(v) {
+            this.user.prefs = v;
+        },
+        setUserOrgs(v) {
+            this.user.prefs.hidden_organizations = v;
+        },
         async fetchUserInfo() {
             const logStore = useLogStore();
             this.loading = true;
@@ -75,6 +81,43 @@ export const useUserStore = defineStore("userStore", {
             } finally {
                 this.loading = false;
             }
+        },
+        async saveUserConfig() {
+            const githubToken = useCookie("token");
+            const organizationStore = useOrganizationStore();
+            const projectStore = useProjectStore();
+            const hiddenIds = organizationStore.organizations
+                .filter((o) => {
+                    return o.hidden;
+                })
+                .map((o) => {
+                    return o.id;
+                });
+            const projectHiddenIds = projectStore.getProjects
+                .filter((p) => {
+                    return p.user_hidden;
+                })
+                .map((p) => {
+                    return p.id;
+                });
+            // this.user.prefs.hidden_organizations = hiddenIds;
+            // this.user.prefs.hidden_projects = projectHiddenIds;
+            //update user
+            const users = await $fetch("/api/user/update", {
+                method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${githubToken.value}`,
+                },
+                body: {
+                    id: this.user.id,
+                    prefs: {
+                        hidden_projects: projectHiddenIds,
+                        hidden_organizations: hiddenIds,
+                    },
+                },
+            });
+            this.user = users;
+            return users;
         },
         logout() {
             this.user = {};
