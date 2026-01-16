@@ -155,7 +155,9 @@
                         v-for="user in props.users"
                         :key="user.id"
                         :user="user"
-                        :show-cards="props.showCards"
+                        :show-cards="
+                            props.showCards || user.id == currentUser.id
+                        "
                         :timer="props.startTimerTime" />
                 </template>
                 <v-card
@@ -175,6 +177,10 @@
 </template>
 <script setup>
 const cardStore = useCardStore();
+const userStore = useUserStore();
+const currentUser = computed(() => {
+    return userStore.getUser;
+});
 const emits = defineEmits([
     "reset",
     "clean",

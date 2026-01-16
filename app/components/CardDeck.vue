@@ -68,6 +68,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    cards: {
+        type: Array,
+        default: () => [],
+    },
 });
 
 const isManagement = computed(() => {
@@ -75,7 +79,7 @@ const isManagement = computed(() => {
 });
 
 const cards = computed(() => {
-    return loading.value ? [] : cardStore.getCards;
+    return loading.value ? [] : props.cards;
 });
 
 const loading = computed(() => {

@@ -62,6 +62,7 @@
                             :issue="activeIssue" />
                         <v-sheet class="pa-4">
                             <CardDeck
+                                v-if="activeIssue"
                                 :card-selected="voteValue"
                                 :cards="computedCards"
                                 :disabled="cardsDisabled"
@@ -126,6 +127,9 @@ const canRender = ref(false);
 
 const projectId = computed(() => {
     return route.params.projectId;
+});
+const projectNodeId = computed(() => {
+    return projectStore.getActiveProject.id;
 });
 const organizationId = computed(() => {
     return route.params.organizationId;
@@ -271,9 +275,9 @@ function setIssueDifficulty(dificulty) {
             dificulty: dificulty,
             authToken: organizationToken.value, //token vindo da organização
             organization: organizationLogin.value,
-            projectId: projectId.value,
+            projectId: projectNodeId.value,
             itemId: activeIssue.value.id,
-            fieldId: "", //verificar qual o fieldId de dificuldade
+            fieldId: projectStore.getActiveProject.config.dificultyFieldId, //verificar qual o fieldId de dificuldade
         });
     }
 }

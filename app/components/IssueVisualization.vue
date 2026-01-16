@@ -6,9 +6,14 @@
                 v-html="issueTitle" />
         </template>
         <template #append>
-            <span class="mr-4"
-                >{{ props.issue.repository }}/#{{ props.issue.number }}</span
-            >
+            <span class="mr-4">
+                <a
+                    :href="issueLink"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >{{ props.issue.repository }}/#{{ props.issue.number }}</a
+                >
+            </span>
         </template>
     </v-toolbar>
     <v-sheet class="issue-visualization">
@@ -18,6 +23,7 @@
     </v-sheet>
 </template>
 <script setup>
+const organizationStore = useOrganizationStore();
 const props = defineProps({
     issue: {
         type: Object,
@@ -31,6 +37,9 @@ const issueBody = computed(() => {
 });
 const issueTitle = computed(() => {
     return parseGitMD(props.issue.title);
+});
+const issueLink = computed(() => {
+    return `https://github.com/${organizationStore.getActiveOrganization.login}/${props.issue.repository}/issues/${props.issue.number}`;
 });
 </script>
 <style lang="scss" scoped>
