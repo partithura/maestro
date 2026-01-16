@@ -26,10 +26,19 @@ export const useProjectStore = defineStore("projectStore", {
     actions: {
         async fetchProjects() {
             const logStore = useLogStore();
+            const organizationStore = useOrganizationStore();
+            const githubToken = useCookie("token").value;
             try {
                 this.loading = true;
                 const response = await $fetch("/api/projects/read", {
                     method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${githubToken}`,
+                    },
+                    query: {
+                        organization:
+                            organizationStore.getActiveOrganization.login,
+                    },
                 });
                 this.projects = response;
             } catch (error) {
@@ -75,7 +84,10 @@ export const useProjectStore = defineStore("projectStore", {
                 this.loading = false;
             }
         },
-        setActiveProject(pid) {
+        async setActiveProject(pid) {
+            if (!this.projects.length) {
+                await this.fetchProjects();
+            }
             if (pid) {
                 const logStore = useLogStore();
                 const projectIndex = this.projects.findIndex((p) => {
@@ -153,8 +165,40 @@ export const useProjectStore = defineStore("projectStore", {
                 this.loading = false;
             }
         },
+        async updateConfig() {
+            const logStore = useLogStore();
+            try {
+                this.loading = true;
+                const response = await $fetch("/api/projects/update", {
+                    method: "POST",
+                    body: {
+                        ...this.activeProject,
+                        config: {
+                            ...this.activeProject.config,
+                            dificultyFieldId:
+                                this.activeProject.config.dificultyFieldId,
+                        },
+                    },
+                });
+                this.activeProject = response;
+                this.projects.find((p) => {
+                    return p.number == this.activeProject.number;
+                }).config.dificultyFieldId = response?.config?.dificultyFieldId;
+            } catch (error) {
+                logStore.createAlert({
+                    text: error.data?.message,
+                    title: "Erro de atualização",
+                    icon: "mdi-database-alert",
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
         setProjectAreas(areas) {
             this.activeProject.config.areas = areas;
+        },
+        setDificultyField(v) {
+            this.activeProject.config.dificultyFieldId = v;
         },
         async deleteProject(project) {
             const logStore = useLogStore();
@@ -170,6 +214,31 @@ export const useProjectStore = defineStore("projectStore", {
                     text: error.data?.message,
                     title: "Erro excluindo projeto",
                     icon: "mdi-delete",
+                });
+            } finally {
+                this.loading = false;
+            }
+        },
+        async getProjectFields() {
+            const logStore = useLogStore();
+            const githubToken = useCookie("token").value;
+            try {
+                this.loading = true;
+                const response = await $fetch("/api/projects/fields", {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${githubToken}`,
+                    },
+                    query: {
+                        projectId: this.activeProject.id,
+                    },
+                });
+                return response;
+            } catch (error) {
+                logStore.createAlert({
+                    text: error.data?.message,
+                    title: "Erro de atualização",
+                    icon: "mdi-database-alert",
                 });
             } finally {
                 this.loading = false;

@@ -2,8 +2,8 @@
     <v-col
         v-if="isManagement"
         cols="12"
-        md="3"
-        lg="2"
+        md="2"
+        lg="1"
         xl="1"
         xxl="1">
         <v-tooltip

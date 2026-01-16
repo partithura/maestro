@@ -107,9 +107,16 @@ const items = computed(() => {
 });
 
 const effort = computed(() => {
-    return cardStore.getCards.filter((c) => {
-        return typeof c.value == "number";
-    });
+    return cardStore.getCards
+        .map((c) => {
+            return {
+                ...c,
+                value: Number(c.value),
+            };
+        })
+        .filter((c) => {
+            return typeof c.value == "number";
+        });
 });
 
 const tooltip = computed(() => {

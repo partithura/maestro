@@ -35,7 +35,7 @@ export const useUserStore = defineStore("userStore", {
                         Authorization: `Bearer ${githubToken.value}`,
                     },
                 });
-                this.users = users;
+                this.user = users;
                 return users;
             } catch (error) {
                 logStore.createAlert({

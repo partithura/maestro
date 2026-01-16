@@ -2,20 +2,7 @@ import { defineStore } from "pinia";
 
 export const useCardStore = defineStore("cardStore", {
     state: () => ({
-        cards: [
-            {
-                value: 0,
-                tooltip: "Sem Valor",
-            },
-            {
-                value: 1,
-                tooltip: "Até 1 hora",
-            },
-            {
-                value: 2,
-                tooltip: "Até 2 hora",
-            },
-        ],
+        cards: [],
         loading: false,
         errorMessage: "",
     }),

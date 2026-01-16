@@ -25,6 +25,8 @@ definePageMeta({
     pageName: "Configuração Global",
 });
 const navigationStore = useNavigationStore();
+const userStore = useUserStore();
+const logStore = useLogStore();
 
 const baseRoute = computed(() => {
     return `/`;
@@ -38,5 +40,16 @@ onMounted(() => {
             to: `/configuration`,
         },
     ]);
+});
+onBeforeMount(() => {
+    if (!userStore.getUser.isManagement) {
+        logStore.createAlert({
+            text: "Você não tem permissão para acessar essa rota",
+            title: "Acesso negado",
+            type: "warning",
+            icon: "mdi-cancel",
+        });
+        navigateTo("/");
+    }
 });
 </script>

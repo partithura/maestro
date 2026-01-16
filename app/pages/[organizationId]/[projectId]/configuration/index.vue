@@ -1,7 +1,9 @@
 <template>
     <v-row>
         <DefaultHeader :to="baseRoute" />
-        <v-col cols="12">
+        <v-col
+            v-if="isManagement"
+            cols="12">
             <v-row
                 dense
                 align="center"
@@ -48,6 +50,20 @@
                         <div class="px-4 py-2">Áreas</div>
                     </v-btn>
                 </v-col>
+                <v-col
+                    cols="12"
+                    md="6"
+                    lg="4"
+                    xl="3"
+                    xxl="2">
+                    <v-btn
+                        :to="`${configRoute}/fields`"
+                        height="120px"
+                        block
+                        size="x-large">
+                        <div class="px-4 py-2">Outros</div>
+                    </v-btn>
+                </v-col>
             </v-row>
         </v-col>
     </v-row>
@@ -62,6 +78,8 @@ const route = useRoute();
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();
 const organizationStore = useOrganizationStore();
+const userStore = useUserStore();
+const logStore = useLogStore();
 
 const baseRoute = computed(() => {
     return `/${organizationId.value}/${projectId.value}`;
@@ -78,35 +96,49 @@ const organizationName = computed(() => {
 });
 
 const projectName = computed(() => {
-    return projectStore.getActiveProject.name;
+    return projectStore.getActiveProject.title;
 });
 const projectId = computed(() => {
     return route.params.projectId;
 });
 
-onMounted(() => {
-    navigationStore.setBreadcrumbs([
-        {
-            title: `${organizationName.value}`,
-            disabled: false,
-            to: `/${organizationId.value}`,
-        },
-        {
-            title: `${projectName.value}`,
-            disabled: false,
-            to: `/${organizationId.value}/${projectId.value}`,
-        },
-        {
-            title: `Configurações do projeto`,
-            disabled: true,
-            to: `/${organizationId.value}/${projectId.value}/configuration`,
-        },
-    ]);
+const isManagement = computed(() => {
+    return userStore.getUser.isManagement;
 });
+
+onMounted(() => {});
 onBeforeMount(() => {
-    projectStore.fetchProjects();
-    projectStore.setActiveProject(route.params.projectId);
-    organizationStore.fetchOrganizations();
-    organizationStore.setActiveOrganization(route.params.organizationId);
+    organizationStore
+        .setActiveOrganization(route.params.organizationId)
+        .then(() => {
+            projectStore.setActiveProject(route.params.projectId).then(() => {
+                if (!isManagement.value) {
+                    logStore.createAlert({
+                        text: "Você não tem permissão para acessar essa rota",
+                        title: "Acesso negado",
+                        type: "warning",
+                        icon: "mdi-cancel",
+                    });
+                    navigateTo(`/${organizationId.value}/${projectId.value}`);
+                }
+                navigationStore.setBreadcrumbs([
+                    {
+                        title: `${organizationName.value}`,
+                        disabled: false,
+                        to: `/${organizationId.value}`,
+                    },
+                    {
+                        title: `${projectName.value}`,
+                        disabled: false,
+                        to: `/${organizationId.value}/${projectId.value}`,
+                    },
+                    {
+                        title: `Configurações do projeto`,
+                        disabled: true,
+                        to: `/${organizationId.value}/${projectId.value}/configuration`,
+                    },
+                ]);
+            });
+        });
 });
 </script>

@@ -229,9 +229,18 @@ const props = defineProps({
 });
 
 const finalValue = ref();
+const cards = computed(() => {
+    return cardStore.getCards;
+});
 const possibleValues = computed(() => {
     return cardStore.getCards
-        ?.filter((m) => {
+        .map((c) => {
+            return {
+                ...c,
+                value: Number(c.value),
+            };
+        })
+        .filter((m) => {
             return typeof m.value == "number";
         })
         .map((m) => {

@@ -19,22 +19,16 @@
 //colocar sistema de alertas e carregamento de configurações aqui
 const navigationStore = useNavigationStore();
 const userStore = useUserStore();
-const cardStore = useCardStore();
 const configStore = useConfigStore();
 const logStore = useLogStore();
-const projectStore = useProjectStore();
 const organizationStore = useOrganizationStore();
 
 const hasData = ref(false);
 
-onMounted(async () => {
-    await Promise.all([
-        configStore.fetchConfig(),
-        logStore.fetchChangeLog(),
-        cardStore.fetchCards(),
-        projectStore.fetchProjects(),
-        organizationStore.fetchOrganizations(),
-    ]);
+onBeforeMount(async () => {
+    await organizationStore.fetchOrganizations();
+    await configStore.fetchConfig();
+    await logStore.fetchChangeLog();
     hasData.value = true;
 });
 

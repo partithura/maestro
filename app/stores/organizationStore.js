@@ -5,6 +5,7 @@ export const useOrganizationStore = defineStore("organizationStore", {
         organizations: [],
         loading: false,
         activeOrganization: null,
+        userOrganizations: [],
     }),
     getters: {
         getOrganizations: (state) => {
@@ -14,16 +15,28 @@ export const useOrganizationStore = defineStore("organizationStore", {
             return state.loading;
         },
         getActiveOrganization: (state) => {
+            if (!state.activeOrganization) {
+                const routeOrgId = useRoute().params.organizationId;
+                state.activeOrganization = state.organizations.find((org) => {
+                    return org.id == routeOrgId;
+                });
+            }
             return state.activeOrganization;
         },
     },
     actions: {
         async fetchOrganizations() {
             const logStore = useLogStore();
+            const userStore = useUserStore();
+            const githubToken = useCookie("token").value;
             try {
                 this.loading = true;
-                const response = await $fetch("/api/organizations/read", {
-                    method: "GET",
+                const response = await $fetch("/api/organizations/user_read", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${githubToken}`,
+                        username: await userStore.getUser.login,
+                    },
                 });
                 this.organizations = response;
             } catch (error) {
@@ -36,7 +49,28 @@ export const useOrganizationStore = defineStore("organizationStore", {
                 this.loading = false;
             }
         },
-        setActiveOrganization(orgNum) {
+        // async notfetchOrganizations() {
+        //     const logStore = useLogStore();
+        //     try {
+        //         this.loading = true;
+        //         const response = await $fetch("/api/organizations/read", {
+        //             method: "GET",
+        //         });
+        //         this.organizations = response;
+        //     } catch (error) {
+        //         logStore.createAlert({
+        //             text: error.data?.message,
+        //             title: "Erro de carregamento",
+        //             icon: "mdi-database-alert",
+        //         });
+        //     } finally {
+        //         this.loading = false;
+        //     }
+        // },
+        async setActiveOrganization(orgNum) {
+            if (!this.organizations.length) {
+                await this.fetchOrganizations();
+            }
             if (orgNum) {
                 const logStore = useLogStore();
                 const orgIndex = this.organizations.findIndex((org) => {
@@ -96,6 +130,34 @@ export const useOrganizationStore = defineStore("organizationStore", {
                     icon: "mdi-content-save-alert",
                 });
                 throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+        async setOrganizationConfig({ token }) {
+            const logStore = useLogStore();
+
+            try {
+                this.loading = true;
+                const response = await $fetch("/api/organizations/update", {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: {
+                        id: this.activeOrganization.id,
+                        organizationToken: token,
+                    },
+                });
+                this.fetchOrganizations().then(() => {
+                    this.setActiveOrganization(response.id);
+                });
+            } catch (error) {
+                logStore.createAlert({
+                    text: error.data?.message,
+                    title: "Erro de carregamento",
+                    icon: "mdi-database-alert",
+                });
             } finally {
                 this.loading = false;
             }

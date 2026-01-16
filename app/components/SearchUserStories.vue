@@ -52,11 +52,7 @@ function isSelected(issue) {
 
 function updateQuery() {
     //atualizar a query e chamar api do github
-    console.log("Query", query.value);
-    loading.value = true;
-    setTimeout(() => {
-        loading.value = false;
-    }, 3000);
+    issueStore.setQuery(query.value);
 }
 function setSelection() {
     emits("back", selectedIssues.value);

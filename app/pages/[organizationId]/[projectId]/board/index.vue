@@ -36,7 +36,7 @@ const isManagement = computed(() => {
     return userStore.getUser?.isManagement;
 });
 const projectName = computed(() => {
-    return projectStore.getActiveProject.name;
+    return projectStore.getActiveProject.title;
 });
 const projectId = computed(() => {
     return route.params.projectId;
@@ -68,7 +68,7 @@ onMounted(() => {
 onBeforeMount(() => {
     projectStore.fetchProjects();
     projectStore.setActiveProject(route.params.projectId);
-    organizationStore.fetchOrganizations();
+    // organizationStore.fetchOrganizations();
     organizationStore.setActiveOrganization(route.params.organizationId);
 });
 </script>

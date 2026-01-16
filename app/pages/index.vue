@@ -20,12 +20,18 @@
                         height="120px"
                         block
                         size="x-large">
-                        <div class="px-4 py-2">Configurações globais</div>
+                        <div class="px-4 py-2">Configurações do usuário</div>
                     </v-btn>
                 </v-col>
             </v-row>
-            <hr class="mt-4" />
-            <h3>Organizações:</h3>
+            <v-skeleton-loader
+                v-if="loading"
+                height="6px"
+                class="mt-3" />
+            <hr
+                v-else
+                class="mt-4" />
+            <h3>Suas Organizações:</h3>
             <v-row
                 dense
                 justify="center"
@@ -33,23 +39,23 @@
                 <ItemButtom
                     v-for="organization in organizations"
                     :key="organization.id"
+                    :badge="
+                        organization.organizationToken
+                            ? false
+                            : 'Organização sem definição de token'
+                    "
                     :path="`/${organization.id}`"
-                    :text="organization.name" 
-                    @delete="showDeleteOrganizationDialog(organization)"/>
-                <NewItemButton
-                    tooltip="Adicionar nova organização"
-                    @click="showNewOrganizationDialog" />
+                    :text="organization.login" />
+                <ItemLoader v-if="loading && organizations.length <= 0" />
             </v-row>
         </v-col>
-        <AddOrganizationDialog v-model="newOrganizationModal" />
-        <ConfirmDialog 
+        <ConfirmDialog
             v-model="deleteOrganizationModal"
             :text="`Deseja excluir a organização ${deleteOrganizationSelected?.name}?`"
             confirm-text="excluir"
             :loading="loading"
             @confirm="deleteOrganization()"
-            @cancel="closeDeleteOrganizationDialog()"
-        />
+            @cancel="closeDeleteOrganizationDialog()" />
     </v-row>
 </template>
 <script setup>
@@ -62,7 +68,6 @@ const navigationStore = useNavigationStore();
 const userStore = useUserStore();
 const organizationStore = useOrganizationStore();
 
-const newOrganizationModal = ref(false);
 const deleteOrganizationModal = ref(false);
 
 const deleteOrganizationSelected = ref();
@@ -73,15 +78,11 @@ const isManagement = computed(() => {
 
 const loading = computed(() => {
     return organizationStore.getLoading;
-})
+});
 
 const organizations = computed(() => {
     return organizationStore.getOrganizations;
 });
-
-function showNewOrganizationDialog() {
-    newOrganizationModal.value = true;
-}
 
 function showDeleteOrganizationDialog(org) {
     deleteOrganizationSelected.value = org;
@@ -100,5 +101,8 @@ function deleteOrganization() {
 
 onMounted(() => {
     navigationStore.setBreadcrumbs([]);
+});
+onBeforeMount(() => {
+    organizationStore.fetchOrganizations();
 });
 </script>

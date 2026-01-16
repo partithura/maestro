@@ -1,7 +1,9 @@
 <template>
     <v-row>
         <DefaultHeader :to="previousRoute" />
-        <v-col cols="12">
+        <v-col
+            v-if="isManagement"
+            cols="12">
             <v-row
                 dense
                 align="center"
@@ -20,6 +22,8 @@ definePageMeta({
 const navigationStore = useNavigationStore();
 const projectStore = useProjectStore();
 const organizationStore = useOrganizationStore();
+const userStore = useUserStore();
+const logStore = useLogStore();
 const route = useRoute();
 const previousRoute = computed(() => {
     return `/${organizationId.value}/${projectId.value}/configuration`;
@@ -34,7 +38,10 @@ const organizationName = computed(() => {
     return organizationStore.getActiveOrganization.name;
 });
 const projectName = computed(() => {
-    return projectStore.getActiveProject.name;
+    return projectStore.getActiveProject.title;
+});
+const isManagement = computed(() => {
+    return userStore.getUser.isManagement;
 });
 onMounted(() => {
     navigationStore.setBreadcrumbs([
@@ -61,9 +68,18 @@ onMounted(() => {
     ]);
 });
 onBeforeMount(() => {
-    projectStore.fetchProjects();
+    // projectStore.fetchProjects();
     projectStore.setActiveProject(route.params.projectId);
-    organizationStore.fetchOrganizations();
+    // organizationStore.fetchOrganizations();
     organizationStore.setActiveOrganization(route.params.organizationId);
+    if (!isManagement.value) {
+        logStore.createAlert({
+            text: "Você não tem permissão para acessar essa rota",
+            title: "Acesso negado",
+            type: "warning",
+            icon: "mdi-cancel",
+        });
+        navigateTo(`/${organizationId.value}/${projectId.value}`);
+    }
 });
 </script>

@@ -7,25 +7,27 @@
         xxl="2">
         <div
             class="button-container"
+            :class="{ disabled: props.disabled }"
             :style="computedStyle">
-            <v-tooltip
-                v-if="isManagement"
-                location="bottom center"
-                :text="deleteTooltip">
-                <template #activator="act">
-                    <div
-                        v-bind="act.props"
-                        class="button-delete"
-                        @click="handleDelete()">
-                        <v-icon icon="mdi-delete" />
-                    </div>
-                </template>
-            </v-tooltip>
             <div
-                class="button-action"
-                :class="isManagement ? 'half-width' : 'full-width'"
+                class="button-action full-width"
                 @click="handleClick()">
-                {{ props.text }}
+                <v-tooltip
+                    v-if="props.badge && !props.disabled"
+                    location="top right"
+                    :text="props.badge">
+                    <template #activator="act">
+                        <v-badge
+                            v-bind="act.props"
+                            offset-x="-20"
+                            offset-y="-10"
+                            location="top right"
+                            color="warning">
+                            <span>{{ props.text }}</span>
+                        </v-badge>
+                    </template>
+                </v-tooltip>
+                <span v-else>{{ props.text }}</span>
             </div>
         </div>
     </v-col>
@@ -54,26 +56,42 @@ const props = defineProps({
         type: String,
         default: "/",
     },
+    badge: {
+        type: [String, Boolean],
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
 });
 const computedStyle = computed(() => {
-    return `border-color: ${parseColor(
-        props.color,
-        "#FFFFFF"
-    )}; color: ${parseColor(props.color, "#FFFFFF")}`;
+    return `border-color: ${
+        props.disabled ? "#888888" : parseColor(props.color || "#FFFFFF")
+    }; color: ${
+        props.disabled ? "#888888" : parseColor(props.color || "#FFFFFF")
+    }`;
 });
 const isManagement = computed(() => {
     return userStore.getUser.isManagement;
 });
 
 function handleDelete() {
-    emits("delete");
+    if (!props.disabled) {
+        emits("delete");
+    }
 }
 function handleClick() {
-    emits("click");
-    navigateTo(props.path);
+    if (!props.disabled) {
+        emits("click");
+        navigateTo(props.path);
+    }
 }
 </script>
 <style lang="css" scoped>
+.disabled {
+    cursor: not-allowed !important;
+}
 .button-container {
     cursor: pointer;
     border: 1px solid;

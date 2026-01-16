@@ -1,5 +1,6 @@
 <template>
     <v-row
+        v-if="canRender"
         no-gutters
         dense>
         <DefaultHeader
@@ -56,9 +57,9 @@
                         v-if="showSelectionScreen"
                         @back="addIssues" />
                     <template v-else>
-                        <v-sheet>
-                            <div class="markdown-body" />
-                        </v-sheet>
+                        <IssueVisualization
+                            v-if="activeIssue"
+                            :issue="activeIssue" />
                         <v-sheet class="pa-4">
                             <CardDeck
                                 :card-selected="voteValue"
@@ -121,6 +122,7 @@ const roomName = ref("");
 const activeIssue = ref();
 const issues = ref([]);
 const route = useRoute();
+const canRender = ref(false);
 
 const projectId = computed(() => {
     return route.params.projectId;
@@ -131,8 +133,14 @@ const organizationId = computed(() => {
 const organizationName = computed(() => {
     return organizationStore.getActiveOrganization.name;
 });
+const organizationLogin = computed(() => {
+    return organizationStore.getActiveOrganization.login;
+});
+const organizationToken = computed(() => {
+    return organizationStore.getActiveOrganization.organizationToken;
+});
 const projectName = computed(() => {
-    return projectStore.getActiveProject.name;
+    return projectStore.getActiveProject.title;
 });
 const previousRoute = computed(() => {
     return `/${organizationId.value}/${projectId.value}`;
@@ -185,9 +193,14 @@ const isManagement = computed(() => {
 });
 
 function addIssues(issues) {
-    console.log("Issues:", issues);
+    const mappedIssues = issues.map((i) => {
+        return {
+            ...i.content,
+            id: i.id,
+        };
+    });
     showSelectionScreen.value = false;
-    socket.emit("requestAddIssues", issues);
+    socket.emit("requestAddIssues", mappedIssues);
 }
 
 function toggleAddUserStories(v) {
@@ -256,6 +269,11 @@ function setIssueDifficulty(dificulty) {
         socket.emit("setIssueDifficulty", {
             id: activeIssue.value.id,
             dificulty: dificulty,
+            authToken: organizationToken.value, //token vindo da organização
+            organization: organizationLogin.value,
+            projectId: projectId.value,
+            itemId: activeIssue.value.id,
+            fieldId: "", //verificar qual o fieldId de dificuldade
         });
     }
 }
@@ -287,7 +305,6 @@ function clearVotes() {
 
 function startSession() {
     if (isManagement.value && isConnected.value) {
-        console.log("Starting session");
         socket.emit("requestCreateRoom", {
             name: "partithura", //salas únicas por enquanto
             issues: [],
@@ -297,7 +314,6 @@ function startSession() {
 
 function roomUpdate(room) {
     //atualização da página conforme o objeto room
-    console.log("Room Update:", room);
     if (room) {
         roomName.value = room.name;
         startTimerTime.value = room.lastTimer;
@@ -322,7 +338,12 @@ function connectToServer() {
     try {
         socket.connect();
     } catch (error) {
-        console.log("Erro na conexão:", error);
+        logStore.createAlert({
+            title: "Erro tentando conectar ao server",
+            text: "Houve um erro tentando conectar a sala de votação.",
+            type: "error",
+            icon: "mdi-alert",
+        });
     } finally {
         //metodo unico para atualização do status do frontend
         socket.on("roomUpdate", roomUpdate);
@@ -374,30 +395,37 @@ onBeforeRouteLeave(() => {
     shutdown();
 });
 
-onMounted(() => {
-    navigationStore.setBreadcrumbs([
-        {
-            title: `${organizationName.value}`,
-            disabled: false,
-            to: `/${organizationId.value}`,
-        },
-        {
-            title: `${projectName.value}`,
-            disabled: false,
-            to: `/${organizationId.value}/${projectId.value}`,
-        },
-        {
-            title: `Sala de votação`,
-            disabled: true,
-            to: `/${organizationId.value}/${projectId.value}/room`,
-        },
-    ]);
-});
 onBeforeMount(() => {
-    projectStore.fetchProjects();
-    projectStore.setActiveProject(route.params.projectId);
-    organizationStore.fetchOrganizations();
-    organizationStore.setActiveOrganization(route.params.organizationId);
+    cardStore.fetchCards().then(() => {
+        organizationStore
+            .setActiveOrganization(route.params.organizationId)
+            .then(() => {
+                projectStore
+                    .setActiveProject(route.params.projectId)
+                    .then(() => {
+                        navigationStore.setBreadcrumbs([
+                            {
+                                title: `${organizationName.value}`,
+                                disabled: false,
+                                to: `/${organizationId.value}`,
+                            },
+                            {
+                                title: `${projectName.value}`,
+                                disabled: false,
+                                to: `/${organizationId.value}/${projectId.value}`,
+                            },
+                            {
+                                title: `Sala de votação`,
+                                disabled: true,
+                                to: `/${organizationId.value}/${projectId.value}/room`,
+                            },
+                        ]);
+                    })
+                    .finally(() => {
+                        canRender.value = true;
+                    });
+            });
+    });
 });
 </script>
 <style lang="scss" scoped>

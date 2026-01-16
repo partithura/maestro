@@ -34,7 +34,26 @@
                         height="120px"
                         block
                         size="x-large">
-                        <div class="px-4 py-2">Configurações do projeto</div>
+                        <v-tooltip
+                            v-if="showBadge"
+                            location="top right"
+                            text="Projeto sem definição de campo de dificuldade">
+                            <template #activator="act">
+                                <v-badge
+                                    v-bind="act.props"
+                                    location="top right"
+                                    color="warning">
+                                    <div class="px-4 py-2">
+                                        Configurações do projeto
+                                    </div>
+                                </v-badge>
+                            </template>
+                        </v-tooltip>
+                        <div
+                            v-else
+                            class="px-4 py-2">
+                            Configurações do projeto
+                        </div>
                     </v-btn>
                 </v-col>
                 <v-col
@@ -45,6 +64,7 @@
                     xxl="2">
                     <v-btn
                         :to="`${baseRoute}/room`"
+                        :disabled="showBadge"
                         height="120px"
                         block
                         size="x-large">
@@ -67,7 +87,6 @@
                 </v-col>
             </v-row>
         </v-col>
-        <AddProjectDialog v-model="newProjectModel" />
     </v-row>
 </template>
 <script setup>
@@ -85,6 +104,9 @@ const route = useRoute();
 const organizationId = computed(() => {
     return route.params.organizationId;
 });
+const showBadge = computed(() => {
+    return !projectStore.getActiveProject?.config?.dificultyFieldId;
+});
 
 const organizationName = computed(() => {
     return organizationStore.getActiveOrganization.name;
@@ -94,13 +116,13 @@ const isManagement = computed(() => {
     return userStore.getUser?.isManagement;
 });
 const projectName = computed(() => {
-    return projectStore.getActiveProject.name;
+    return projectStore.getActiveProject?.title;
 });
 const projectId = computed(() => {
     return route.params.projectId;
 });
 const errorState = computed(() => {
-    return projectStore.getActiveProject.error;
+    return projectStore.getActiveProject?.error;
 });
 const baseRoute = computed(() => {
     return `/${organizationId.value}/${projectId.value}`;
@@ -110,24 +132,25 @@ const projects = computed(() => {
 });
 const newProjectModel = ref(false);
 
-onMounted(() => {
-    navigationStore.setBreadcrumbs([
-        {
-            title: `${organizationName.value}`,
-            disabled: false,
-            to: `/${organizationId.value}`,
-        },
-        {
-            title: `${projectName.value}`,
-            disabled: true,
-            to: `/${projectId.value}`,
-        },
-    ]);
-});
+onMounted(() => {});
 onBeforeMount(() => {
-    projectStore.fetchProjects();
-    projectStore.setActiveProject(route.params.projectId);
-    organizationStore.fetchOrganizations();
-    organizationStore.setActiveOrganization(route.params.organizationId);
+    organizationStore
+        .setActiveOrganization(route.params.organizationId)
+        .then(() => {
+            projectStore.setActiveProject(route.params.projectId).then(() => {
+                navigationStore.setBreadcrumbs([
+                    {
+                        title: `${organizationName.value}`,
+                        disabled: false,
+                        to: `/${organizationId.value}`,
+                    },
+                    {
+                        title: `${projectName.value}`,
+                        disabled: true,
+                        to: `/${projectId.value}`,
+                    },
+                ]);
+            });
+        });
 });
 </script>

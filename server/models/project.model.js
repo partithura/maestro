@@ -2,8 +2,11 @@ import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema({
     number: { type: Number, required: true },
-    name: { type: String, required: true },
+    title: { type: String, required: true },
+    id: { type: String },
+    organization: { type: String },
     query: { type: String, default: "" },
+    color: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
     config: {
         cardDeck: [{ type: mongoose.Schema.Types.ObjectId, ref: "Card" }],
@@ -19,6 +22,7 @@ const projectSchema = new mongoose.Schema({
                 ref: "EffortArea",
             },
         ],
+        dificultyFieldId: { type: String },
     },
 });
 

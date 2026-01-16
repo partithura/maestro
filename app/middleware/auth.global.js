@@ -1,8 +1,6 @@
 export default defineNuxtRouteMiddleware((to) => {
     const userStore = useUserStore();
-    const route = useRoute();
     const token = useCookie("token");
-    console.log("Route:", route);
     const publicPages = ["/login"];
     if (publicPages.includes(to.path)) {
         if (token.value) {

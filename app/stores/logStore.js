@@ -62,7 +62,7 @@ export const useLogStore = defineStore("logStore", {
                     title: "Erro:",
                     text: "Um erro desconhecido ocorreu.",
                     timestamp: new Date().getTime(),
-                    id: crypto.randomUUID(),
+                    id: Math.random() * 999999999999999,
                 },
                 alert
             );

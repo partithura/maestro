@@ -6,6 +6,8 @@ import mongoose from "mongoose";
 import User from "~~/server/models/user.model";
 import Room from "../models/room.model";
 import Issue from "../models/issue.model";
+import { Octokit } from "octokit";
+import { UPDATE_ISSUE_FIELD_DIFICULDADE } from "../utils/mutations";
 import { env } from "~~/server/support/env";
 
 export default defineNitroPlugin(async (nitroApp) => {
@@ -89,9 +91,12 @@ export default defineNitroPlugin(async (nitroApp) => {
         updateStatus();
     }
 
-    function setIssueDifficulty(issue) {
+    async function setIssueDifficulty(issue) {
         const issueIndex = activeRoom.issues.findIndex((_issue) => {
             return _issue.id == issue.id;
+        });
+        const octokit = new Octokit({
+            auth: issue.authToken, //token precisa vir da organização
         });
         if (issueIndex >= 0) {
             //issue encontrada na sessão ativa
@@ -100,9 +105,17 @@ export default defineNitroPlugin(async (nitroApp) => {
             if (activeRoom.issues.length > issueIndex + 1) {
                 activeRoom.activeIssue = activeRoom.issues[issueIndex + 1];
             }
-            // const db_issue = await Issue.findOne({ id: issue.id }); //encontrar a issue no banco mongo
-            // db_issue.show_votes = true;
+            const db_issue = await Issue.findOne({ id: issue.id }); //encontrar a issue no banco mongo
+            db_issue.dificulty = issue.dificulty;
+            db_issue.done = true;
+            await db_issue.save();
             //TODO: chamar api do github pra definir a dificuldade
+            await octokit.graphql(UPDATE_ISSUE_FIELD_DIFICULDADE, {
+                projectId: issue.projectId,
+                itemId: issue.itemId,
+                fieldId: issue.fieldId,
+                value: issue.dificulty,
+            });
         }
         updateStatus();
     }
@@ -113,6 +126,7 @@ export default defineNitroPlugin(async (nitroApp) => {
         });
         if (issueIndex >= 0) {
             activeRoom.activeIssue = activeRoom.issues[issueIndex];
+            activeRoom.cardsFlipped = false;
         }
         updateStatus();
     }
@@ -131,7 +145,6 @@ export default defineNitroPlugin(async (nitroApp) => {
 
     async function onVote(socket, config) {
         const timestamp = new Date().getTime();
-        console.warn("votando:", config);
         if (activeRoom?.name) {
             const issueIndex = activeRoom.issues.findIndex((s) => {
                 return s.id == config.issue.id;
@@ -169,13 +182,21 @@ export default defineNitroPlugin(async (nitroApp) => {
                         filter: { id: issue.id },
                         update: {
                             $setOnInsert: {
-                                ...issue,
+                                id: issue.id,
+                                title: issue.title,
+                                number: issue.number,
+                                repository: issue.repository.name,
+                                body: issue.body,
+                                created_at: new Date().getTime(),
+                                updated_at: new Date().getTime(),
+                                item_url: issue.url,
                             },
                         },
                         upsert: true,
                     },
                 };
             });
+
             const issueIds = issues.map((issue) => {
                 //filtro das issues por ID para verificar no mongo depois
                 return issue.id;
